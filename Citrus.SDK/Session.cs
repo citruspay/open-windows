@@ -19,6 +19,7 @@ namespace Citrus.SDK
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
 
     using Citrus.SDK.Common;
@@ -37,6 +38,11 @@ namespace Citrus.SDK
         private static OAuthToken signUpToken;
 
         /// <summary>
+        /// Sign Up Token
+        /// </summary>
+        private static OAuthToken signInToken;
+
+        /// <summary>
         /// Session User
         /// </summary>
         private static User user;
@@ -51,8 +57,14 @@ namespace Citrus.SDK
         /// <returns>
         /// Auth token
         /// </returns>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         public static string GetAuthToken()
         {
+            if (signInToken != null)
+            {
+                return signInToken.AccessToken;
+            }
+
             return signUpToken != null ? signUpToken.AccessToken : string.Empty;
         }
 
@@ -62,7 +74,7 @@ namespace Citrus.SDK
         /// <returns>
         /// Account balance
         /// </returns>
-        public static async Task<bool> GetBalance()
+        public static async Task<User> GetBalance()
         {
             if (string.IsNullOrEmpty(user.UserName))
             {
@@ -70,16 +82,19 @@ namespace Citrus.SDK
             }
 
             var rest = new RestWrapper();
-            var result = await rest.Post<User>(Service.GetBalance);
+            var result = await rest.Get<User>(Service.GetBalance);
 
             if (!(result is Error))
             {
-                return !string.IsNullOrEmpty(result.ToString());
+                var balance = (User)result;
+                user.BalanceAmount = balance.BalanceAmount;
+                user.CurrencyFormat = balance.CurrencyFormat;
+                return user;
             }
 
             Utility.ParseAndThrowError((result as Error).Response);
 
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -99,7 +114,7 @@ namespace Citrus.SDK
             var result =
                 await
                 rest.Post<User>(
-                    Service.ResetPassword, 
+                    Service.ResetPassword,
                     new List<KeyValuePair<string, string>>
                         {
                             new KeyValuePair<string, string>(
@@ -134,9 +149,9 @@ namespace Citrus.SDK
             var request = new SigninRequest { User = new User { UserName = userName, Password = password } };
 
             var rest = new RestWrapper();
-            var result = await rest.Post<object>(Service.Signin, request);
+            signInToken = (OAuthToken)await rest.Post<OAuthToken>(Service.Signin, request);
 
-            return result != null;
+            return signInToken != null && !string.IsNullOrEmpty(signInToken.AccessToken);
         }
 
         /// <summary>
@@ -151,7 +166,7 @@ namespace Citrus.SDK
         /// <returns>
         /// Logged In user's detail
         /// </returns>
-        public static async Task<User> SignupUser(string email, string mobile)
+        public static async Task<User> SignupUser(string email, string mobile, string password)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -163,6 +178,11 @@ namespace Citrus.SDK
                 throw new ArgumentException("Invalid parameter", "mobile");
             }
 
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentException("Invalid parameter", "password");
+            }
+
             await GetSignupToken();
             var objectToPost = new User { Email = email, Mobile = mobile };
             user = objectToPost;
@@ -171,6 +191,15 @@ namespace Citrus.SDK
             if (!(result is Error))
             {
                 user = (User)result;
+                var success = await SigninUser(user.UserName, user.Password);
+                if (success)
+                {
+                    success = await UpdatePassword(user.Password, password);
+                    if (success)
+                    {
+                        return await GetBalance();
+                    }
+                }
             }
             else
             {
@@ -197,6 +226,7 @@ namespace Citrus.SDK
         /// New Password.
         /// </param>
         /// <returns>
+        /// Success or Failure
         /// </returns>
         public static async Task<bool> UpdatePassword(string oldPassword, string newPassword)
         {
@@ -206,8 +236,7 @@ namespace Citrus.SDK
                                   new KeyValuePair<string, string>("new", newPassword)
                               };
             var rest = new RestWrapper();
-            var result = await rest.Post<object>(Service.UpdatePassword, request);
-            return result != null;
+            return await rest.Put(Service.UpdatePassword, request);
         }
 
         #endregion

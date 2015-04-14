@@ -52,6 +52,18 @@ namespace Citrus.SDK.Entity
         [JsonProperty("username")]
         public string UserName { get; set; }
 
+        /// <summary>
+        /// Balance Amount
+        /// </summary>
+        [JsonProperty("value")]
+        public string BalanceAmount { get; set; }
+
+        /// <summary>
+        /// Currency Format
+        /// </summary>
+        [JsonProperty("currency")]
+        public string CurrencyFormat { get; set; }
+
         #endregion
 
         #region Public Methods and Operators

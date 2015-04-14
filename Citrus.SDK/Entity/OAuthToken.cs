@@ -35,6 +35,12 @@ namespace Citrus.SDK.Entity
         public string AccessToken { get; set; }
 
         /// <summary>
+        /// Access Token
+        /// </summary>
+        [JsonProperty("refresh_token")]
+        public string RefreshToken { get; set; }
+
+        /// <summary>
         /// Expires In
         /// </summary>
         [JsonProperty("expires_in")]
