@@ -81,6 +81,18 @@ namespace Citrus.SDK.Entity
         [JsonIgnore]
         public string Response { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonProperty("type")]
+        public string ErrorType { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonProperty("description")]
+        public string ErrorDescription { get; set; }
+
         #endregion
 
         #region Public Methods and Operators

@@ -54,18 +54,24 @@ namespace Citrus.SDK
         /// <summary>
         /// Get Auth token.
         /// </summary>
+        /// <param name="authTokenType">
+        /// Type of auth token to get
+        /// </param>
         /// <returns>
         /// Auth token
         /// </returns>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-        public static string GetAuthToken()
+        public static string GetAuthToken(AuthTokenType authTokenType)
         {
-            if (signInToken != null)
+            switch (authTokenType)
             {
-                return signInToken.AccessToken;
+                case AuthTokenType.SignIn:
+                    return signInToken != null ? signInToken.AccessToken : string.Empty;
+                case AuthTokenType.SignUp:
+                    return signUpToken != null ? signUpToken.AccessToken : string.Empty;
+                default:
+                    return string.Empty;
             }
-
-            return signUpToken != null ? signUpToken.AccessToken : string.Empty;
         }
 
         /// <summary>
@@ -82,7 +88,7 @@ namespace Citrus.SDK
             }
 
             var rest = new RestWrapper();
-            var result = await rest.Get<User>(Service.GetBalance);
+            var result = await rest.Get<User>(Service.GetBalance, AuthTokenType.SignIn);
 
             if (!(result is Error))
             {
@@ -120,7 +126,8 @@ namespace Citrus.SDK
                             new KeyValuePair<string, string>(
                                 "username", 
                                 user.UserName)
-                        });
+                        },
+                    AuthTokenType.SignIn);
 
             if (!(result is Error))
             {
@@ -149,9 +156,14 @@ namespace Citrus.SDK
             var request = new SigninRequest { User = new User { UserName = userName, Password = password } };
 
             var rest = new RestWrapper();
-            signInToken = (OAuthToken)await rest.Post<OAuthToken>(Service.Signin, request);
+            var result = await rest.Post<OAuthToken>(Service.Signin, AuthTokenType.None, request);
+            if (!(result is Error))
+            {
+                return signInToken != null && !string.IsNullOrEmpty(signInToken.AccessToken);
+            }
 
-            return signInToken != null && !string.IsNullOrEmpty(signInToken.AccessToken);
+            Utility.ParseAndThrowError((result as Error).Response);
+            return false;
         }
 
         /// <summary>
@@ -187,30 +199,30 @@ namespace Citrus.SDK
             var objectToPost = new User { Email = email, Mobile = mobile };
             user = objectToPost;
             var rest = new RestWrapper();
-            var result = await rest.Post<User>(Service.Signup, objectToPost);
+            var result = await rest.Post<User>(Service.Signup, AuthTokenType.SignUp, objectToPost);
             if (!(result is Error))
             {
                 user = (User)result;
-                var success = await SigninUser(user.UserName, user.Password);
-                if (success)
+                if (!string.IsNullOrEmpty(user.UserName))
                 {
-                    success = await UpdatePassword(user.Password, password);
+                    var randomPasswordGenerator = new RandomPasswordGenerator();
+                    user.Password = randomPasswordGenerator.Generate(user.Email, user.Mobile);
+
+                    var success = await SigninUser(user.UserName, user.Password);
                     if (success)
                     {
-                        return await GetBalance();
+                        success = await UpdatePassword(user.Password, password);
+                        if (success)
+                        {
+                            user.Password = password;
+                            return await GetBalance();
+                        }
                     }
                 }
             }
             else
             {
                 Utility.ParseAndThrowError((result as Error).Response);
-            }
-
-            if (!string.IsNullOrEmpty(user.UserName))
-            {
-                var randomPasswordGenerator = new RandomPasswordGenerator();
-                user.Password = randomPasswordGenerator.Generate(user.Email, user.Mobile);
-                return user;
             }
 
             return new User();
@@ -236,7 +248,7 @@ namespace Citrus.SDK
                                   new KeyValuePair<string, string>("new", newPassword)
                               };
             var rest = new RestWrapper();
-            return await rest.Put(Service.UpdatePassword, request);
+            return await rest.Put(Service.UpdatePassword, request, AuthTokenType.SignIn);
         }
 
         #endregion
@@ -256,7 +268,7 @@ namespace Citrus.SDK
             }
 
             var rest = new RestWrapper();
-            var result = await rest.Post<OAuthToken>(Service.SignUpToken, new SignupTokenRequest());
+            var result = await rest.Post<OAuthToken>(Service.SignUpToken, AuthTokenType.None, new SignupTokenRequest());
             if (!(result is Error))
             {
                 signUpToken = (OAuthToken)result;

@@ -47,12 +47,12 @@ namespace Citrus.SDK.Common
         /// <returns>
         /// Success or Failure
         /// </returns>
-        public async Task<bool> Put(string relativeServicePath, IEnumerable<KeyValuePair<string, string>> urlParams)
+        public async Task<bool> Put(string relativeServicePath, IEnumerable<KeyValuePair<string, string>> urlParams, AuthTokenType authTokenType)
         {
             var client = new HttpClient();
             HttpResponseMessage response;
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken());
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken(authTokenType));
 
             response = await client.GetAsync(Config.Environment.GetEnumDescription() + relativeServicePath);
 
@@ -76,12 +76,12 @@ namespace Citrus.SDK.Common
         /// <returns>
         /// Result Object
         /// </returns>
-        public async Task<IEntity> Get<T>(string relativeServicePath)
+        public async Task<IEntity> Get<T>(string relativeServicePath, AuthTokenType authTokenType)
         {
             var client = new HttpClient();
             HttpResponseMessage response;
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken());
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken(authTokenType));
 
             response = await client.GetAsync(Config.Environment.GetEnumDescription() + relativeServicePath);
 
@@ -96,15 +96,20 @@ namespace Citrus.SDK.Common
 
             return await this.ReturnError(response);
         }
-        
+
         /// <summary>
         /// Post object to Service
         /// </summary>
         /// <param name="relativeServicePath">
         /// Relative REST method path
         /// </param>
+        /// <param name="authTokenType">
+        /// </param>
         /// <param name="objectToPost">
         /// Object to Post
+        /// </param>
+        /// <param name="isRaw">
+        /// Flag to mention whether the object is to be posted in request body
         /// </param>
         /// <typeparam name="T">
         /// Return object type
@@ -112,31 +117,40 @@ namespace Citrus.SDK.Common
         /// <returns>
         /// Result Object
         /// </returns>
-        public async Task<IEntity> Post<T>(string relativeServicePath, IEntity objectToPost = null)
+        public async Task<IEntity> Post<T>(string relativeServicePath, AuthTokenType authTokenType, IEntity objectToPost = null, bool isRaw = false)
         {
             var client = new HttpClient();
-            HttpResponseMessage response;
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken());
-
-            if (objectToPost != null)
+            HttpResponseMessage response = null;
+            var serializer = new JsonSerializer();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken(authTokenType));
+            if (!isRaw)
             {
-                var content = new FormUrlEncodedContent(objectToPost.ToKeyValuePair());
-                response =
-                    await client.PostAsync(Config.Environment.GetEnumDescription() + relativeServicePath, content);
+                if (objectToPost != null)
+                {
+                    var content = new FormUrlEncodedContent(objectToPost.ToKeyValuePair());
+                    response =
+                        await client.PostAsync(Config.Environment.GetEnumDescription() + relativeServicePath, content);
+                }
+                else
+                {
+                    response =
+                        await
+                        client.PostAsync(
+                            Config.Environment.GetEnumDescription() + relativeServicePath,
+                            new StringContent(string.Empty));
+                }
             }
             else
             {
+                var stringContent = new StringWriter();
+                serializer.Serialize(stringContent, objectToPost);
+                var content = new StringContent(stringContent.ToString());
                 response =
-                    await
-                    client.PostAsync(
-                        Config.Environment.GetEnumDescription() + relativeServicePath, 
-                        new StringContent(string.Empty));
+                    await client.PostAsync(Config.Environment.GetEnumDescription() + relativeServicePath, content);
             }
 
             if (response.IsSuccessStatusCode)
             {
-                var serializer = new JsonSerializer();
                 return
                     (IEntity)
                     serializer.Deserialize<T>(
@@ -161,15 +175,13 @@ namespace Citrus.SDK.Common
         /// <returns>
         /// Result Object
         /// </returns>
-        public async Task<IEntity> Post<T>(
-            string relativeServicePath, 
-            IEnumerable<KeyValuePair<string, string>> urlParams)
+        public async Task<IEntity> Post<T>(string relativeServicePath, IEnumerable<KeyValuePair<string, string>> urlParams, AuthTokenType authTokenType)
         {
             var client = new HttpClient();
             HttpResponseMessage response;
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken());
-            
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken(authTokenType));
+
             var content = new FormUrlEncodedContent(urlParams);
             response = await client.PostAsync(Config.Environment.GetEnumDescription() + relativeServicePath, content);
 

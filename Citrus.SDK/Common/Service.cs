@@ -60,6 +60,11 @@ namespace Citrus.SDK.Common
         public const string UpdatePassword = ServiceVersion + "identity/me/password";
 
         /// <summary>
+        /// Load Money endpoint
+        /// </summary>
+        public const string LoadMoney = "service/moto/authorize/struct/payment";
+
+        /// <summary>
         /// Base service path with version
         /// </summary>
         private const string ServiceVersion = "service/v2/";

@@ -35,5 +35,52 @@ namespace Citrus.SDK.Common
         /// </summary>
         [Description("https://admin.citruspay.com/")]
         Production
-    };
+    }
+
+    /// <summary>
+    ///     Authentication Token Type
+    /// </summary>
+    public enum AuthTokenType
+    {
+        /// <summary>
+        /// Unauthorized access
+        /// </summary>
+        None,
+
+        /// <summary>
+        ///     Sign In Token Type
+        /// </summary>
+        SignIn,
+
+        /// <summary>
+        ///     Sign Up Token Type
+        /// </summary>
+        SignUp
+    }
+
+    public enum CardType
+    {
+        [Description("debit")]
+        Debit,
+        [Description("credit")]
+        Credit
+    }
+
+    public enum CardSchemeType
+    {
+        [Description("VISA")]
+        Visa,
+        [Description("MASTER")]
+        Master
+    }
+
+    public enum PaymentType
+    {
+        [Description("paymentOptionToken")]
+        Card,
+        [Description("paymentOptionIdToken")]
+        Token,
+        [Description("netbanking")]
+        NetBanking
+    }
 }

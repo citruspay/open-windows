@@ -49,7 +49,7 @@ namespace Citrus.SDK.Common
 
             var serializer = new JsonSerializer();
             var error = serializer.Deserialize<Error>(new JsonTextReader(new StringReader(response)));
-            throw new Exception(error.Message);
+            throw new ServiceException(string.IsNullOrEmpty(error.Code) ? error.ErrorDescription : error.Message);
         }
 
         #endregion
