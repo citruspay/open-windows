@@ -52,7 +52,7 @@ namespace Citrus.SDK.Common
             var client = new HttpClient();
             HttpResponseMessage response;
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken(authTokenType));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
 
             response = await client.GetAsync(Config.Environment.GetEnumDescription() + relativeServicePath);
 
@@ -81,7 +81,7 @@ namespace Citrus.SDK.Common
             var client = new HttpClient();
             HttpResponseMessage response;
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken(authTokenType));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
 
             response = await client.GetAsync(Config.Environment.GetEnumDescription() + relativeServicePath);
 
@@ -122,7 +122,7 @@ namespace Citrus.SDK.Common
             var client = new HttpClient();
             HttpResponseMessage response = null;
             var serializer = new JsonSerializer();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken(authTokenType));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
             if (!isRaw)
             {
                 if (objectToPost != null)
@@ -180,7 +180,7 @@ namespace Citrus.SDK.Common
             var client = new HttpClient();
             HttpResponseMessage response;
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Session.GetAuthToken(authTokenType));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
 
             var content = new FormUrlEncodedContent(urlParams);
             response = await client.PostAsync(Config.Environment.GetEnumDescription() + relativeServicePath, content);

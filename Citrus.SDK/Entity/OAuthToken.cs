@@ -19,6 +19,9 @@ namespace Citrus.SDK.Entity
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    using Citrus.SDK.Common;
 
     using Newtonsoft.Json;
 
@@ -40,11 +43,31 @@ namespace Citrus.SDK.Entity
         [JsonProperty("refresh_token")]
         public string RefreshToken { get; set; }
 
+        private string _expiresIn;
+
         /// <summary>
         /// Expires In
         /// </summary>
         [JsonProperty("expires_in")]
-        public string ExpiresIn { get; set; }
+        public string ExpiresIn
+        {
+            get
+            {
+                return _expiresIn;
+            }
+
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return;
+                }
+
+                this.ExpirationTime = DateTime.Now.AddMilliseconds(Convert.ToDouble(value));
+
+                this._expiresIn = value;
+            }
+        }
 
         /// <summary>
         /// Scope
@@ -57,6 +80,8 @@ namespace Citrus.SDK.Entity
         /// </summary>
         [JsonProperty("token_type")]
         public string TokenType { get; set; }
+
+        internal DateTime ExpirationTime { get; set; }
 
         #endregion
 
@@ -71,6 +96,40 @@ namespace Citrus.SDK.Entity
         public IEnumerable<KeyValuePair<string, string>> ToKeyValuePair()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<string> GetActiveTokenAsync()
+        {
+            if (this.ExpirationTime != default(DateTime) && DateTime.Now > this.ExpirationTime)
+            {
+                //Renew token
+                var rest = new RestWrapper();
+                var result = await rest.Post<OAuthToken>(
+                        Service.Signin,
+                        new List<KeyValuePair<string, string>>()
+                            {
+                                new KeyValuePair<string, string>("client_id", Config.SignInId),
+                                new KeyValuePair<string, string>("client_secret", Config.SignInSecret),
+                                new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                                new KeyValuePair<string, string>("refresh_token", this.RefreshToken)
+                            },
+                        AuthTokenType.None);
+
+                if (!(result is Error))
+                {
+                    var oauthToken = result as OAuthToken;
+                    if (oauthToken != null)
+                    {
+                        this.AccessToken = oauthToken.AccessToken;
+                        this.RefreshToken = oauthToken.RefreshToken;
+                        this.ExpiresIn = oauthToken.ExpiresIn;
+                        this.Scope = oauthToken.Scope;
+                        this.TokenType = oauthToken.TokenType;
+                    }
+                }
+            }
+
+            return this.AccessToken;
         }
 
         #endregion

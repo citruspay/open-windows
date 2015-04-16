@@ -61,14 +61,14 @@ namespace Citrus.SDK
         /// Auth token
         /// </returns>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-        public static string GetAuthToken(AuthTokenType authTokenType)
+        public static async Task<string> GetAuthTokenAsync(AuthTokenType authTokenType)
         {
             switch (authTokenType)
             {
                 case AuthTokenType.SignIn:
-                    return signInToken != null ? signInToken.AccessToken : string.Empty;
+                    return signInToken != null ? await signInToken.GetActiveTokenAsync() : string.Empty;
                 case AuthTokenType.SignUp:
-                    return signUpToken != null ? signUpToken.AccessToken : string.Empty;
+                    return signUpToken != null ? await signUpToken.GetActiveTokenAsync() : string.Empty;
                 default:
                     return string.Empty;
             }
