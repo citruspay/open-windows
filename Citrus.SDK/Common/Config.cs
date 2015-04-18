@@ -138,6 +138,7 @@ namespace Citrus.SDK.Common
         public static void Reset()
         {
             Session.SignOut();
+            Session.Config = new Config();
         }
 
         public override bool Equals(object obj)

@@ -27,12 +27,12 @@ namespace Citrus.SDK.Common
         /// <summary>
         /// Get Balance endpoint
         /// </summary>
-        public const string GetBalance = "/service/v2/prepayment/balance";
+        public const string GetBalance = ServiceVersion + "prepayment/balance";
 
         /// <summary>
         /// Random Password endpoint
         /// </summary>
-        public const string RandonPassword = "oauth/token";
+        public const string PrepaidBill = ServiceVersion + "prepayment/load";
 
         /// <summary>
         /// Reset Password endpoint

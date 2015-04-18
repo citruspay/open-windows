@@ -22,6 +22,7 @@ namespace Citrus.SDK.Common
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Text;
     using System.Threading.Tasks;
 
     using Citrus.SDK.Entity;
@@ -47,21 +48,21 @@ namespace Citrus.SDK.Common
         /// <returns>
         /// Success or Failure
         /// </returns>
-        public async Task<bool> Put(string relativeServicePath, IEnumerable<KeyValuePair<string, string>> urlParams, AuthTokenType authTokenType)
+        public async Task<object> Put(string relativeServicePath, IEnumerable<KeyValuePair<string, string>> urlParams, AuthTokenType authTokenType)
         {
             var client = new HttpClient();
             HttpResponseMessage response;
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+            var content = new FormUrlEncodedContent(urlParams);
+            response = await client.PutAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
 
-            response = await client.GetAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath);
-
-            if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
+            if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.NoContent)
             {
                 return true;
             }
 
-            return false;
+            return new Error(await response.Content.ReadAsStringAsync());
         }
 
         /// <summary>
@@ -144,9 +145,8 @@ namespace Citrus.SDK.Common
             {
                 var stringContent = new StringWriter();
                 serializer.Serialize(stringContent, objectToPost);
-                var content = new StringContent(stringContent.ToString());
-                response =
-                    await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
+                var content = new StringContent(stringContent.ToString(), Encoding.UTF8, "application/json");
+                response = await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
             }
 
             if (response.IsSuccessStatusCode)
@@ -212,9 +212,17 @@ namespace Citrus.SDK.Common
         /// </returns>
         private async Task<IEntity> ReturnError(HttpResponseMessage response)
         {
-            return response.StatusCode == HttpStatusCode.BadRequest
-                       ? new Error(await response.Content.ReadAsStringAsync())
-                       : new Error();
+            if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return new Error(await response.Content.ReadAsStringAsync());
+            }
+
+            if (response.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                throw new ServiceException("Server is down at this time, Please try again later.");
+            }
+
+            throw new ServiceException("Something went wrong");
         }
 
         #endregion

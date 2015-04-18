@@ -1,5 +1,6 @@
 ﻿namespace Citrus.SDK
 {
+    using System;
     using System.Threading.Tasks;
 
     using Citrus.SDK.Common;
@@ -7,12 +8,12 @@
 
     public static class Wallet
     {
-        private static async Task<PrepaidBill> GetPrepaidBalanceAsync(int amount, string currencyType, string redirectUrl)
+        private static async Task<PrepaidBill> GetPrepaidBillAsync(int amount, string currencyType, string redirectUrl)
         {
             var restWrapper = new RestWrapper();
             var result =
                 await restWrapper.Post<PrepaidBill>(
-                    Service.GetBalance,
+                    Service.PrepaidBill,
                     AuthTokenType.SignIn,
                     new PrepaidBillRequest()
                         {
@@ -31,7 +32,14 @@
 
         public static async Task<Transaction> LoadMoneyAsync(LoadMoneyRequest request)
         {
-            var prepaidBill = await GetPrepaidBalanceAsync(
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            if (Session.signInToken == null || string.IsNullOrEmpty(Session.signInToken.AccessToken))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform this operation");
+            }
+
+            var prepaidBill = await GetPrepaidBillAsync(
                 request.BillAmount.Value,
                 request.BillAmount.CurrencyType,
                 request.RedirectUrl);

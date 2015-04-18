@@ -35,12 +35,12 @@ namespace Citrus.SDK
         /// <summary>
         /// Sign Up Token
         /// </summary>
-        private static OAuthToken signUpToken;
+        internal static OAuthToken signUpToken;
 
         /// <summary>
         /// Sign Up Token
         /// </summary>
-        private static OAuthToken signInToken;
+        internal static OAuthToken signInToken;
 
         /// <summary>
         /// Session User
@@ -76,17 +76,19 @@ namespace Citrus.SDK
             }
         }
 
-        private static async Task GetTokenIfEmptyAsync(AuthTokenType authTokenType)
+        internal static async Task GetTokenIfEmptyAsync(AuthTokenType authTokenType)
         {
             if (authTokenType == AuthTokenType.SignIn && signInToken == null)
             {
                 signInToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.SignInTokenKey);
-                await signInToken.GetActiveTokenAsync();
+                if (signInToken != null)
+                    await signInToken.GetActiveTokenAsync();
             }
             else if (authTokenType == AuthTokenType.SignUp && signUpToken == null)
             {
                 signUpToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.SignUpTokenKey);
-                await signUpToken.GetActiveTokenAsync();
+                if (signUpToken != null)
+                    await signUpToken.GetActiveTokenAsync();
             }
         }
 
@@ -129,6 +131,12 @@ namespace Citrus.SDK
         /// </returns>
         public static async Task ResetPassword(string userName)
         {
+            if (string.IsNullOrEmpty(Config.SignUpId) || string.IsNullOrEmpty(Config.SignUpSecret))
+            {
+                throw new ServiceException("Invalid Configuration: Client ID & Client Secret");
+            }
+
+            await GetSignupToken();
             var rest = new RestWrapper();
             var result =
                 await
@@ -140,16 +148,12 @@ namespace Citrus.SDK
                                 "username", 
                                 userName)
                         },
-                    AuthTokenType.SignIn);
+                    AuthTokenType.SignUp);
 
             if (result is Error)
             {
                 Utility.ParseAndThrowError((result as Error).Response);
             }
-            //else
-            //{
-            //    SignOut();
-            //}
         }
 
         /// <summary>
@@ -228,7 +232,7 @@ namespace Citrus.SDK
             var result = await rest.Post<User>(Service.Signup, AuthTokenType.SignUp, objectToPost);
             if (!(result is Error))
             {
-                user = (User)result;
+                user.UserName = ((User)result).UserName;
                 if (!string.IsNullOrEmpty(user.UserName))
                 {
                     var randomPasswordGenerator = new RandomPasswordGenerator();
@@ -281,7 +285,22 @@ namespace Citrus.SDK
                                   new KeyValuePair<string, string>("new", newPassword)
                               };
             var rest = new RestWrapper();
-            return await rest.Put(Service.UpdatePassword, request, AuthTokenType.SignIn);
+            var result = await rest.Put(Service.UpdatePassword, request, AuthTokenType.SignIn);
+
+            if (result is bool && (bool)result)
+            {
+                return true;
+            }
+            else
+            {
+                var error = result as Error;
+                if (error != null)
+                {
+                    Utility.ParseAndThrowError(error.Response);
+                }
+            }
+
+            return false;
         }
 
         #endregion
@@ -315,12 +334,11 @@ namespace Citrus.SDK
             }
         }
 
-        internal static void SignOut()
+        public static void SignOut()
         {
             signInToken = new OAuthToken();
             signUpToken = new OAuthToken();
             user = new User();
-            Config = new Config();
             Utility.RemoveAllEntries();
         }
 
