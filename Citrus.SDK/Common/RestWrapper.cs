@@ -54,7 +54,7 @@ namespace Citrus.SDK.Common
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
 
-            response = await client.GetAsync(Config.Environment.GetEnumDescription() + relativeServicePath);
+            response = await client.GetAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath);
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
@@ -83,7 +83,7 @@ namespace Citrus.SDK.Common
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
 
-            response = await client.GetAsync(Config.Environment.GetEnumDescription() + relativeServicePath);
+            response = await client.GetAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath);
 
             if (response.IsSuccessStatusCode)
             {
@@ -129,14 +129,14 @@ namespace Citrus.SDK.Common
                 {
                     var content = new FormUrlEncodedContent(objectToPost.ToKeyValuePair());
                     response =
-                        await client.PostAsync(Config.Environment.GetEnumDescription() + relativeServicePath, content);
+                        await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
                 }
                 else
                 {
                     response =
                         await
                         client.PostAsync(
-                            Config.Environment.GetEnumDescription() + relativeServicePath,
+                            Session.Config.Environment.GetEnumDescription() + relativeServicePath,
                             new StringContent(string.Empty));
                 }
             }
@@ -146,7 +146,7 @@ namespace Citrus.SDK.Common
                 serializer.Serialize(stringContent, objectToPost);
                 var content = new StringContent(stringContent.ToString());
                 response =
-                    await client.PostAsync(Config.Environment.GetEnumDescription() + relativeServicePath, content);
+                    await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
             }
 
             if (response.IsSuccessStatusCode)
@@ -183,7 +183,7 @@ namespace Citrus.SDK.Common
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
 
             var content = new FormUrlEncodedContent(urlParams);
-            response = await client.PostAsync(Config.Environment.GetEnumDescription() + relativeServicePath, content);
+            response = await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
 
             if (response.IsSuccessStatusCode)
             {

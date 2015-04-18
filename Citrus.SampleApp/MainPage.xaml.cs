@@ -19,12 +19,12 @@ namespace Citrus.SampleApp
         public MainPage()
         {
             InitializeComponent();
-
-            Config.Environment = EnvironmentType.Sandbox;
-            Config.SignUpId = "test-signup";
-            Config.SignUpSecret = "c78ec84e389814a05d3ae46546d16d2e";
-            Config.SignInId = "meru-webapp-payment-v1";
-            Config.SignInSecret = "579d6f2c6af04d1dfc605b46da51b450";
+            Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "meru-webapp-payment-v1", "579d6f2c6af04d1dfc605b46da51b450");
+            //Config.Environment = EnvironmentType.Sandbox;
+            //Config.SignUpId = "test-signup";
+            //Config.SignUpSecret = "c78ec84e389814a05d3ae46546d16d2e";
+            //Config.SignInId = "meru-webapp-payment-v1";
+            //Config.SignInSecret = "579d6f2c6af04d1dfc605b46da51b450";
 
             // Sample code to localize the ApplicationBar
             //BuildLocalizedApplicationBar();

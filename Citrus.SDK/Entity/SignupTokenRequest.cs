@@ -38,7 +38,7 @@ namespace Citrus.SDK.Entity
         {
             get
             {
-                return Config.SignUpId;
+                return Session.Config.SignUpId;
             }
         }
 
@@ -50,7 +50,7 @@ namespace Citrus.SDK.Entity
         {
             get
             {
-                return Config.SignUpSecret;
+                return Session.Config.SignUpSecret;
             }
         }
 

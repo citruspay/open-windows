@@ -66,14 +66,6 @@ namespace Citrus.SDK.Common
         Credit
     }
 
-    public enum CardSchemeType
-    {
-        [Description("VISA")]
-        Visa,
-        [Description("MASTER")]
-        Master
-    }
-
     public enum PaymentType
     {
         [Description("paymentOptionToken")]
@@ -82,5 +74,17 @@ namespace Citrus.SDK.Common
         Token,
         [Description("netbanking")]
         NetBanking
+    }
+
+    public enum CreditCardType 
+    {
+        [Description("VISA")]
+        Visa,
+        [Description("MASTER")]
+        MasterCard,
+        [Description("DISCOVER")]
+        Discover,
+        [Description("AMEX")]
+        Amex
     }
 }

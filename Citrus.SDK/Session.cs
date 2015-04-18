@@ -47,6 +47,8 @@ namespace Citrus.SDK
         /// </summary>
         private static User user;
 
+        internal static Config Config;
+
         #endregion
 
         #region Public Methods and Operators
@@ -74,6 +76,20 @@ namespace Citrus.SDK
             }
         }
 
+        private static async Task GetTokenIfEmptyAsync(AuthTokenType authTokenType)
+        {
+            if (authTokenType == AuthTokenType.SignIn && signInToken == null)
+            {
+                signInToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.SignInTokenKey);
+                await signInToken.GetActiveTokenAsync();
+            }
+            else if (authTokenType == AuthTokenType.SignUp && signUpToken == null)
+            {
+                signUpToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.SignUpTokenKey);
+                await signUpToken.GetActiveTokenAsync();
+            }
+        }
+
         /// <summary>
         /// Gets the User account's balance.
         /// </summary>
@@ -82,7 +98,9 @@ namespace Citrus.SDK
         /// </returns>
         public static async Task<User> GetBalance()
         {
-            if (string.IsNullOrEmpty(user.UserName))
+            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
             {
                 throw new UnauthorizedAccessException("User is not logged to perform Get Balance");
             }
@@ -109,13 +127,8 @@ namespace Citrus.SDK
         /// <returns>
         /// Reset state: true for success, false for failure
         /// </returns>
-        public static async Task<bool> ResetPassword()
+        public static async Task ResetPassword(string userName)
         {
-            if (string.IsNullOrEmpty(user.UserName))
-            {
-                throw new UnauthorizedAccessException("User is not logged to perform reset password");
-            }
-
             var rest = new RestWrapper();
             var result =
                 await
@@ -125,18 +138,18 @@ namespace Citrus.SDK
                         {
                             new KeyValuePair<string, string>(
                                 "username", 
-                                user.UserName)
+                                userName)
                         },
                     AuthTokenType.SignIn);
 
-            if (!(result is Error))
+            if (result is Error)
             {
-                return !string.IsNullOrEmpty(result.ToString());
+                Utility.ParseAndThrowError((result as Error).Response);
             }
-
-            Utility.ParseAndThrowError((result as Error).Response);
-
-            return false;
+            //else
+            //{
+            //    SignOut();
+            //}
         }
 
         /// <summary>
@@ -153,12 +166,19 @@ namespace Citrus.SDK
         /// </returns>
         public static async Task<bool> SigninUser(string userName, string password)
         {
+            if (string.IsNullOrEmpty(Config.SignInId) || string.IsNullOrEmpty(Config.SignInSecret))
+            {
+                throw new ServiceException("Invalid Configuration: Client ID & Client Secret");
+            }
+
             var request = new SigninRequest { User = new User { UserName = userName, Password = password } };
 
             var rest = new RestWrapper();
             var result = await rest.Post<OAuthToken>(Service.Signin, AuthTokenType.None, request);
             if (!(result is Error))
             {
+                signInToken = result as OAuthToken;
+                Utility.SaveToLocalStorage(Utility.SignInTokenKey, signInToken);
                 return signInToken != null && !string.IsNullOrEmpty(signInToken.AccessToken);
             }
 
@@ -175,11 +195,17 @@ namespace Citrus.SDK
         /// <param name="mobile">
         /// Mobile
         /// </param>
+        /// <param name="password"></param>
         /// <returns>
         /// Logged In user's detail
         /// </returns>
         public static async Task<User> SignupUser(string email, string mobile, string password)
         {
+            if (string.IsNullOrEmpty(Config.SignUpId) || string.IsNullOrEmpty(Config.SignUpSecret))
+            {
+                throw new ServiceException("Invalid Configuration: Client ID & Client Secret");
+            }
+
             if (string.IsNullOrEmpty(email))
             {
                 throw new ArgumentException("Invalid parameter", "email");
@@ -242,6 +268,13 @@ namespace Citrus.SDK
         /// </returns>
         public static async Task<bool> UpdatePassword(string oldPassword, string newPassword)
         {
+            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Update Password");
+            }
+
             var request = new List<KeyValuePair<string, string>>
                               {
                                   new KeyValuePair<string, string>("old", oldPassword), 
@@ -262,6 +295,8 @@ namespace Citrus.SDK
         /// </returns>
         private static async Task GetSignupToken()
         {
+            await GetTokenIfEmptyAsync(AuthTokenType.SignUp);
+
             if (signUpToken != null)
             {
                 return;
@@ -272,11 +307,21 @@ namespace Citrus.SDK
             if (!(result is Error))
             {
                 signUpToken = (OAuthToken)result;
+                Utility.SaveToLocalStorage(Utility.SignUpTokenKey, signUpToken);
             }
             else
             {
                 Utility.ParseAndThrowError((result as Error).Response);
             }
+        }
+
+        internal static void SignOut()
+        {
+            signInToken = new OAuthToken();
+            signUpToken = new OAuthToken();
+            user = new User();
+            Config = new Config();
+            Utility.RemoveAllEntries();
         }
 
         #endregion

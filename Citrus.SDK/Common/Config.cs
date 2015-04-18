@@ -18,37 +18,151 @@
 
 namespace Citrus.SDK.Common
 {
+    using System.Windows.Controls.Primitives;
+
     /// <summary>
     ///     Config related to accessing Citrus REST end points
     /// </summary>
-    public static class Config
+    public class Config
     {
+        private EnvironmentType environment;
+
+        private string signInId;
+
+        private string signInSecret;
+
+        private string signUpId;
+
+        private string signUpSecret;
+
         #region Public Properties
 
         /// <summary>
         ///     Gets or sets the Target Environment Type ; Sandbox for development and testing, Production for real time or live
         /// </summary>
-        public static EnvironmentType Environment { get; set; }
+        public EnvironmentType Environment
+        {
+            get
+            {
+                return environment;
+            }
+            private set
+            {
+                environment = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the Client Id for Sign In
         /// </summary>
-        public static string SignInId { get; set; }
+        public string SignInId
+        {
+            get
+            {
+                return signInId;
+            }
+            private set
+            {
+                signInId = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the Client Secret for Sign In
         /// </summary>
-        public static string SignInSecret { get; set; }
+        public string SignInSecret
+        {
+            get
+            {
+                return signInSecret;
+            }
+            private set
+            {
+                signInSecret = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the Client Id for Sign Up
         /// </summary>
-        public static string SignUpId { get; set; }
+        public string SignUpId
+        {
+            get
+            {
+                return signUpId;
+            }
+            private set
+            {
+                signUpId = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the Client Secret for Sign Up
         /// </summary>
-        public static string SignUpSecret { get; set; }
+        public string SignUpSecret
+        {
+            get
+            {
+                return signUpSecret;
+            }
+            private set
+            {
+                signUpSecret = value;
+            }
+        }
+
+        public static void Initialize(EnvironmentType environmentType, string signUpClientId, string signUpClientSecret, string signInClientId, string signInClientSecret)
+        {
+            var config = new Config()
+                                 {
+                                     Environment = environmentType,
+                                     SignUpId = signUpClientId,
+                                     SignUpSecret = signUpClientSecret,
+                                     SignInId = signInClientId,
+                                     SignInSecret = signInClientSecret
+                                 };
+
+            var localConfig = Utility.ReadFromLocalStorage<Config>(Utility.ConfigKey);
+
+            if (!config.Equals(localConfig))
+            {
+                Utility.RemoveAllEntries();
+            }
+
+            Session.Config = config;
+            Utility.SaveToLocalStorage(
+                Utility.ConfigKey, Session.Config);
+        }
+
+        public static void Reset()
+        {
+            Session.SignOut();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var config = obj as Config;
+
+            if (config == null)
+            {
+                return false;
+            }
+
+            if (config.environment == this.environment && config.signInId == this.signInId
+                && config.signInSecret == this.signInSecret && config.signUpId == this.signUpId
+                && config.signUpSecret == this.signInSecret)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
 
         #endregion
     }

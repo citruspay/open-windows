@@ -102,14 +102,19 @@ namespace Citrus.SDK.Entity
         {
             if (this.ExpirationTime != default(DateTime) && DateTime.Now > this.ExpirationTime)
             {
+                if (Session.Config == null || string.IsNullOrEmpty(Session.Config.SignInId) || string.IsNullOrEmpty(Session.Config.SignInSecret))
+                {
+                    throw new ServiceException("Invalid Configuration: Client ID & Client Secret");
+                }
+
                 //Renew token
                 var rest = new RestWrapper();
                 var result = await rest.Post<OAuthToken>(
                         Service.Signin,
                         new List<KeyValuePair<string, string>>()
                             {
-                                new KeyValuePair<string, string>("client_id", Config.SignInId),
-                                new KeyValuePair<string, string>("client_secret", Config.SignInSecret),
+                                new KeyValuePair<string, string>("client_id", Session.Config.SignInId),
+                                new KeyValuePair<string, string>("client_secret", Session.Config.SignInSecret),
                                 new KeyValuePair<string, string>("grant_type", "refresh_token"),
                                 new KeyValuePair<string, string>("refresh_token", this.RefreshToken)
                             },

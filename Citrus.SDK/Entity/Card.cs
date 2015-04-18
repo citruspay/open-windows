@@ -23,20 +23,34 @@ namespace Citrus.SDK.Entity
         [JsonProperty("holder")]
         public string AccountHolderName { get; set; }
 
+        private string _cardNumber;
+
         [JsonProperty("number")]
-        public string CardNumber { get; set; }
+        public string CardNumber
+        {
+            get
+            {
+                return this._cardNumber;
+            }
+
+            set
+            {
+                this._cardNumber = value;
+                this.CardScheme = Utility.GetCardTypeFromNumber(value);
+            }
+        }
 
         [JsonProperty("scheme")]
         public string Scheme
         {
             get
             {
-                return this.CardScheme.GetEnumDescription();
+                return this.CardScheme.HasValue ? this.CardScheme.GetEnumDescription() : string.Empty;
             }
         }
 
         [JsonIgnore]
-        public CardSchemeType CardScheme { get; set; }
+        internal CreditCardType? CardScheme { get; set; }
 
         [JsonProperty("type")]
         public string Type
@@ -65,6 +79,6 @@ namespace Citrus.SDK.Entity
 
     public interface IPaymentMode
     {
-        
+
     }
 }
