@@ -80,11 +80,19 @@ namespace Citrus.SDK.Common
     {
         [Description("VISA")]
         Visa,
-        [Description("MASTER")]
-        MasterCard,
         [Description("DISCOVER")]
         Discover,
         [Description("AMEX")]
-        Amex
+        Amex,
+        [Description("MTRO")]
+        Mtro,
+        [Description("MCRD")]
+        Mcrd,
+        [Description("DINERS")]
+        Diners,
+        [Description("JCB")]
+        Jcb,
+        [Description("UNKNOWN")]
+        Unknown
     }
 }

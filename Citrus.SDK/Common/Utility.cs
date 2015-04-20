@@ -21,8 +21,10 @@
 namespace Citrus.SDK.Common
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.IO.IsolatedStorage;
+    using System.Linq;
     using System.Text.RegularExpressions;
 
     using Citrus.SDK.Entity;
@@ -41,6 +43,18 @@ namespace Citrus.SDK.Common
         private const string cardRegex =
             "^(?:(?<Visa>4\\d{3})|(?<MasterCard>5[1-5]\\d{2})|(?<Discover>6011)|(?<DinersClub>(?:3[68]\\d{2})|(?:30[0-5]\\d))|(?<Amex>3[47]\\d{2}))([ -]?)(?(DinersClub)(?:\\d{6}\\1\\d{4})|(?(Amex)(?:\\d{6}\\1\\d{5})|(?:\\d{4}\\1\\d{4}\\1\\d{4})))$";
 
+        private static readonly Dictionary<CreditCardType, string[]> cardTypeWithPrefixes = new Dictionary<CreditCardType, string[]>()
+                                                                            {
+                                                                                { CreditCardType.Visa, new[] { "4" } },
+                                                                                { CreditCardType.Mtro, new[] { "502260", "504433", "504434", "504435", "504437", "504645", "504681","504753", "504775", "504809", "504817", "504834","504848", "504884", "504973", "504993", "508125","508126", "508159", "508192", "508227", "56","600206", "603123", "603741", "603845", "622018", "67"}},
+                                                                                { CreditCardType.Mcrd, new[] { "5" } },
+                                                                                { CreditCardType.Diners, new[] { "30", "36", "38", "39" } },
+                                                                                { CreditCardType.Jcb, new[] { "35" } },
+                                                                                { CreditCardType.Amex, new[] { "34", "37" } },
+                                                                                { CreditCardType.Discover, new[] { "60", "62", "64", "65" } },
+                                                                                { CreditCardType.Unknown, new[] { "0" } }
+                                                                            };
+
         public const string SignUpTokenKey = "SignUpToken";
         public const string SignInTokenKey = "SignInToken";
         public const string ConfigKey = "CitrusMerchatConfig";
@@ -55,42 +69,14 @@ namespace Citrus.SDK.Common
         /// </param>
         /// <returns>
         /// </returns>
-        public static CreditCardType? GetCardTypeFromNumber(string cardNum)
+        public static CreditCardType GetCardTypeFromNumber(string cardNum)
         {
-            // Create new instance of Regex comparer with our
-            // credit card regex patter
-            var cardTest = new Regex(cardRegex);
-
-            // Compare the supplied card number with the regex
-            // pattern and get reference regex named groups
-            GroupCollection gc = cardTest.Match(cardNum).Groups;
-
-            // Compare each card type to the named groups to 
-            // determine which card type the number matches
-            if (gc[CreditCardType.Amex.ToString()].Success)
+            foreach (var cardType in cardTypeWithPrefixes.Where(cardType => cardType.Value.Any(cardNum.StartsWith)))
             {
-                return CreditCardType.Amex;
+                return cardType.Key;
             }
 
-            if (gc[CreditCardType.MasterCard.ToString()].Success)
-            {
-                return CreditCardType.MasterCard;
-            }
-
-            if (gc[CreditCardType.Visa.ToString()].Success)
-            {
-                return CreditCardType.Visa;
-            }
-
-            if (gc[CreditCardType.Discover.ToString()].Success)
-            {
-                return CreditCardType.Discover;
-            }
-
-            // Card type is not supported by our system, return null
-            // (You can modify this code to support more (or less)
-            // card types as it pertains to your application)
-            return null;
+            return CreditCardType.Unknown;
         }
 
         /// <summary>
@@ -168,7 +154,7 @@ namespace Citrus.SDK.Common
             {
                 storageSettings.Remove(SignUpTokenKey);
             }
-            
+
             if (storageSettings.Contains(ConfigKey))
             {
                 storageSettings.Remove(ConfigKey);
