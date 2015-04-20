@@ -116,7 +116,7 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://103.13.97.20/citrus/index.php";
+                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new PaymentDetails()
                                              {
@@ -132,7 +132,7 @@ namespace Citrus.SampleApp
                                                                          Month = 12,
                                                                          Year = 2018
                                                                      },
-                                                             CardNumber = "4280940000193904",
+                                                             CardNumber = "1234567890123456",
                                                              CardType = CardType.Debit
                                                          }
                                              };
@@ -171,7 +171,7 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://103.13.97.20/citrus/index.php";
+                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new PaymentDetails()
                 {
@@ -217,7 +217,7 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://103.13.97.20/citrus/index.php";
+                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new PaymentDetails()
                 {
