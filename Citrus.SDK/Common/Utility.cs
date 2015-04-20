@@ -177,6 +177,42 @@ namespace Citrus.SDK.Common
             storageSettings.Save();
         }
 
+        public static bool PassesLuhnTest(string cardNumber)
+        {
+            //Clean the card number- remove dashes and spaces
+            cardNumber = cardNumber.Replace("-", "").Replace(" ", "");
+
+            //Convert card number into digits array
+            int[] digits = new int[cardNumber.Length];
+            for (int len = 0; len < cardNumber.Length; len++)
+            {
+                digits[len] = Int32.Parse(cardNumber.Substring(len, 1));
+            }
+
+            //Luhn Algorithm
+            //Adapted from code availabe on Wikipedia at
+            //http://en.wikipedia.org/wiki/Luhn_algorithm
+            int sum = 0;
+            bool alt = false;
+            for (int i = digits.Length - 1; i >= 0; i--)
+            {
+                int curDigit = digits[i];
+                if (alt)
+                {
+                    curDigit *= 2;
+                    if (curDigit > 9)
+                    {
+                        curDigit -= 9;
+                    }
+                }
+                sum += curDigit;
+                alt = !alt;
+            }
+
+            //If Mod 10 equals 0, the number is good and this will return true
+            return sum % 10 == 0;
+        }
+
         #endregion
     }
 }

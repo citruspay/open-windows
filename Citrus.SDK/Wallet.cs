@@ -39,6 +39,12 @@
                 throw new UnauthorizedAccessException("User is not logged to perform this operation");
             }
 
+            var card = request.PaymentDetails.PaymentMode as Card;
+            if (card != null && !Utility.PassesLuhnTest(card.CardNumber))
+            {
+                throw new ArgumentException("Invalid card number, Please provide a valid card detail");
+            }
+
             var prepaidBill = await GetPrepaidBillAsync(
                 request.BillAmount.Value,
                 request.BillAmount.CurrencyType,

@@ -132,7 +132,7 @@ namespace Citrus.SampleApp
                                                                          Month = 12,
                                                                          Year = 2018
                                                                      },
-                                                             CardNumber = "1234567890123456",
+                                                             CardNumber = "4242424242424242",
                                                              CardType = CardType.Debit
                                                          }
                                              };

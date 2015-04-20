@@ -69,7 +69,7 @@ namespace Citrus.SDK.Entity
         {
             get
             {
-                return string.Format("{0}/{1}", this.ExpiryDate.Month, this.ExpiryDate.Year);
+                return string.Format("{0}/{1}", this.ExpiryDate.Month.ToString("MM"), this.ExpiryDate.Year);
             }
         }
 
