@@ -63,7 +63,7 @@ namespace Citrus.SDK
         /// Auth token
         /// </returns>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-        public static async Task<string> GetAuthTokenAsync(AuthTokenType authTokenType)
+        internal static async Task<string> GetAuthTokenAsync(AuthTokenType authTokenType)
         {
             switch (authTokenType)
             {
