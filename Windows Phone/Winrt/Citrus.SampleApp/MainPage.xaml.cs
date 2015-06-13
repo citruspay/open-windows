@@ -31,7 +31,6 @@ namespace Citrus.SampleApp
         public MainPage()
         {
             this.InitializeComponent();
-            //Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "meru-webapp-payment-v1", "579d6f2c6af04d1dfc605b46da51b450");
             Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "test-signin", "52f7e15efd4208cf5345dd554443fd99");
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
