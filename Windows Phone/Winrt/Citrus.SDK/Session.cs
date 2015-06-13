@@ -190,6 +190,8 @@ namespace Citrus.SDK
             return false;
         }
 
+
+
         /// <summary>
         /// Sign up an user account.
         /// </summary>
@@ -301,6 +303,61 @@ namespace Citrus.SDK
             }
 
             return false;
+        }
+
+        public static async Task<User> BindUser(string email, string mobile)
+        {
+            if (string.IsNullOrEmpty(Config.SignUpId) || string.IsNullOrEmpty(Config.SignUpSecret))
+            {
+                throw new ServiceException("Invalid Configuration: Client ID & Client Secret");
+            }
+
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException("Invalid parameter", "email");
+            }
+
+            if (string.IsNullOrEmpty(mobile))
+            {
+                throw new ArgumentException("Invalid parameter", "mobile");
+            }
+
+            await GetSignupToken();
+            var objectToPost = new User { Email = email, Mobile = mobile };
+            user = objectToPost;
+            var rest = new RestWrapper();
+            var result = await rest.Post<User>(Service.BindUser, AuthTokenType.SignUp, objectToPost);
+            if (!(result is Error))
+            {
+                user.UserName = ((User)result).UserName;
+                if (!string.IsNullOrEmpty(user.UserName))
+                {
+                    var signInRequest = new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>("client_id", Config.SignInId),
+                        new KeyValuePair<string, string>("client_secret", Config.SignInSecret),
+                        new KeyValuePair<string, string>("grant_type", "username"),
+                        new KeyValuePair<string, string>("username", user.Email)
+                    };
+
+                    var authTokenResult = await rest.Post<OAuthToken>(Service.Signin, signInRequest, AuthTokenType.None);
+
+                    if (!(authTokenResult is Error))
+                    {
+                        signInToken = authTokenResult as OAuthToken;
+                        return user;
+                    }
+
+                    Utility.ParseAndThrowError((authTokenResult as Error).Response);
+                    return null;
+                }
+            }
+            else
+            {
+                Utility.ParseAndThrowError((result as Error).Response);
+            }
+
+            return null;
         }
 
         #endregion

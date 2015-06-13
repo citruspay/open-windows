@@ -25,7 +25,7 @@
                         <StackPanel Margin="10">
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Text="Username: "></TextBlock>
-                                <TextBlock Text="{Binding Username}"></TextBlock>
+                                <TextBlock Text="{Binding UserName}"></TextBlock>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Text="Mobile: "></TextBlock>
@@ -83,6 +83,29 @@
                 <Grid>
                     <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Reset" Click="Reset_OnClick"></Button>
 
+                </Grid>
+            </PivotItem>
+            
+            <PivotItem Header="Bind User">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Link" Click="BindUser_OnClick"></Button>
+                    <StackPanel Grid.Row="1" Name="BindResultPanel">
+                        <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Result:"></TextBlock>
+                        <StackPanel Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <TextBlock Text="Username: "></TextBlock>
+                                <TextBlock Text="{Binding UserName}"></TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <TextBlock Text="Mobile: "></TextBlock>
+                                <TextBlock Text="{Binding Mobile}"></TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
             </PivotItem>
         </Pivot>

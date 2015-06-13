@@ -69,6 +69,8 @@ namespace Citrus.SDK.Common
         /// </summary>
         private const string ServiceVersion = "service/v2/";
 
+        public const string BindUser = ServiceVersion + "identity/bind";
+
         #endregion
     }
 }

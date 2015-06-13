@@ -31,6 +31,7 @@ namespace Citrus.SampleApp
         public MainPage()
         {
             this.InitializeComponent();
+            //Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "meru-webapp-payment-v1", "579d6f2c6af04d1dfc605b46da51b450");
             Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "test-signin", "52f7e15efd4208cf5345dd554443fd99");
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
@@ -289,6 +290,31 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 await Session.ResetPassword("user7@gmail.com");
                 new MessageDialog("Password reset completed").ShowAsync();
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void BindUser_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                BindResultPanel.DataContext = await Session.BindUser("user7@gmail.com", "9876543210");
             }
             catch (ServiceException exception)
             {
