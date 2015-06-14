@@ -73,7 +73,7 @@ namespace Citrus.SDK.Common
 
         public const string Wallet = ServiceVersion + "profile/me/payment";
 
-        public const string GetMercharPaymentOptions = "service/v1/merchant/pgsetting";
+        public const string GetMerchantPaymentOptions = "service/v1/merchant/pgsetting";
 
         #endregion
     }

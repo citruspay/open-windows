@@ -113,7 +113,7 @@ namespace Citrus.SDK
         public static async Task GetMerchantPaymentOptions()
         {
             RestWrapper restWrapper = new RestWrapper();
-            var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMercharPaymentOptions, new List<KeyValuePair<string, string>>()
+            var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMerchantPaymentOptions, new List<KeyValuePair<string, string>>()
             {
                 new KeyValuePair<string, string>("vanity",Session.Config.Vanity)
             }, AuthTokenType.SignIn);
