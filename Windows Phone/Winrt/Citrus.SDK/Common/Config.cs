@@ -33,6 +33,8 @@ namespace Citrus.SDK.Common
 
         private string signUpSecret;
 
+        private string vanity;
+
         #region Public Properties
 
         /// <summary>
@@ -110,7 +112,22 @@ namespace Citrus.SDK.Common
             }
         }
 
-        public static void Initialize(EnvironmentType environmentType, string signUpClientId, string signUpClientSecret, string signInClientId, string signInClientSecret)
+        /// <summary>
+        ///     Gets or sets the Client Secret for Sign Up
+        /// </summary>
+        public string Vanity
+        {
+            get
+            {
+                return this.vanity;
+            }
+            private set
+            {
+                this.vanity = value;
+            }
+        }
+
+        public static void Initialize(EnvironmentType environmentType, string signUpClientId, string signUpClientSecret, string signInClientId, string signInClientSecret, string vanity)
         {
             var config = new Config()
                                  {
@@ -118,7 +135,8 @@ namespace Citrus.SDK.Common
                                      SignUpId = signUpClientId,
                                      SignUpSecret = signUpClientSecret,
                                      SignInId = signInClientId,
-                                     SignInSecret = signInClientSecret
+                                     SignInSecret = signInClientSecret,
+                                     Vanity = vanity
                                  };
 
             var localConfig = Utility.ReadFromLocalStorage<Config>(Utility.ConfigKey);

@@ -31,7 +31,7 @@ namespace Citrus.SampleApp
         public MainPage()
         {
             this.InitializeComponent();
-            Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "test-signin", "52f7e15efd4208cf5345dd554443fd99");
+            Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "test-signin", "52f7e15efd4208cf5345dd554443fd99", "prepaid");
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
 
@@ -314,6 +314,60 @@ namespace Citrus.SampleApp
             {
                 LoadingBar.Visibility = Visibility.Visible;
                 BindResultPanel.DataContext = await Session.BindUser("user7@gmail.com", "9876543210");
+                
+                await Wallet.GetMerchantPaymentOptions();
+                await Wallet.GetWallet();
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void GetMerchantPaymentOptions_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                await Wallet.GetMerchantPaymentOptions();
+                new MessageDialog("Merchant payment options retreived").ShowAsync();
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void GetWallet_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                UserPaymentOptionsListBox.ItemsSource= await Wallet.GetWallet();
             }
             catch (ServiceException exception)
             {

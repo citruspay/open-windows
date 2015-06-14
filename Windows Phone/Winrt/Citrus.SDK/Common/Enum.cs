@@ -58,6 +58,8 @@ namespace Citrus.SDK.Common
 
     public enum CardType
     {
+        [Value("")]
+        UnKnown,
         [Value("debit")]
         Debit,
         [Value("credit")]

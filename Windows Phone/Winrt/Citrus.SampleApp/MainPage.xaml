@@ -10,7 +10,7 @@
 
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <!--Pivot Control-->
-        <ProgressBar Height="40" HorizontalAlignment="Stretch" Visibility="Collapsed" VerticalAlignment="Center" Name="LoadingBar" IsEnabled="True" Foreground="Red" IsIndeterminate="True"></ProgressBar>
+        
         <Pivot Title="Citrus Pay SDK Sample">
             <!--Pivot item one-->
             <PivotItem Header="Sign up">
@@ -85,7 +85,7 @@
 
                 </Grid>
             </PivotItem>
-            
+
             <PivotItem Header="Bind User">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -108,7 +108,29 @@
                     </StackPanel>
                 </Grid>
             </PivotItem>
+            <PivotItem Header="Wallet">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Content="Get Merchant Payment Options" Click="GetMerchantPaymentOptions_OnClick"></Button>
+                    <Button Content="Get User Payment Options" Grid.Row="1" Click="GetWallet_OnClick"></Button>  
+                    <ListBox x:Name="UserPaymentOptionsListBox" Grid.Row="2">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </PivotItem>
         </Pivot>
+
+        <ProgressBar Height="40" HorizontalAlignment="Stretch" Visibility="Collapsed" VerticalAlignment="Center" Name="LoadingBar" IsEnabled="True" Foreground="Red" IsIndeterminate="True"></ProgressBar>
     </Grid>
 
 </Page>

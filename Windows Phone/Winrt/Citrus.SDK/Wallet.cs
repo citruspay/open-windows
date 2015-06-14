@@ -1,4 +1,10 @@
-﻿namespace Citrus.SDK
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+
+namespace Citrus.SDK
 {
     using System;
     using System.Threading.Tasks;
@@ -8,6 +14,8 @@
 
     public static class Wallet
     {
+        private static MerchantPaymentOptions merchantPaymentOptions;
+
         private static async Task<PrepaidBill> GetPrepaidBillAsync(int amount, string currencyType, string redirectUrl)
         {
             var restWrapper = new RestWrapper();
@@ -69,6 +77,54 @@
 
             Utility.ParseAndThrowError(((Error)result).Response);
             return null;
+        }
+
+        public static async Task<List<PaymentOption>> GetWallet()
+        {
+            var signInToken = await Session.GetAuthTokenAsync(AuthTokenType.SignIn);
+            if (string.IsNullOrEmpty(signInToken))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
+            }
+
+            var restWrapper = new RestWrapper();
+            var response = await restWrapper.Get<UserWallet>(Service.Wallet, AuthTokenType.SignIn);
+            var options = new List<PaymentOption>();
+            if (!(response is Error))
+            {
+                var wallet = response as UserWallet;
+                if (wallet != null)
+                {
+                    if (merchantPaymentOptions != null)
+                    {
+                        options.AddRange(wallet.PaymentOptions.Where(option => merchantPaymentOptions.ContainScheme(option.CardScheme, option.CardType, option.Bank)));
+                        return options;
+                    }
+
+                    return wallet.PaymentOptions.ToList();
+                }
+                return null;
+            }
+
+            Utility.ParseAndThrowError(((Error)response).Response);
+            return null;
+        }
+
+        public static async Task GetMerchantPaymentOptions()
+        {
+            RestWrapper restWrapper = new RestWrapper();
+            var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMercharPaymentOptions, new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("vanity",Session.Config.Vanity)
+            }, AuthTokenType.SignIn);
+
+            if (!(paymentOptions is Error))
+            {
+                merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
+                return;
+            }
+
+            Utility.ParseAndThrowError(((Error)paymentOptions).Response);
         }
     }
 }
