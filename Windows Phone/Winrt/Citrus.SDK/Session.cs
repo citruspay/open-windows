@@ -305,7 +305,7 @@ namespace Citrus.SDK
             return false;
         }
 
-        public static async Task<User> BindUser(string email, string mobile)
+        internal static async Task<User> BindUser(string email, string mobile)
         {
             if (string.IsNullOrEmpty(Config.SignUpId) || string.IsNullOrEmpty(Config.SignUpSecret))
             {
@@ -358,6 +358,24 @@ namespace Citrus.SDK
             }
 
             return null;
+        }
+
+        public static async Task<bool> LinkUser(string email, string mobile)
+        {
+            var newUser = await BindUser(email, mobile);
+            var randomPasswordGenerator = new RandomPasswordGenerator();
+            newUser.Password = randomPasswordGenerator.Generate(newUser.Email, newUser.Mobile);
+
+            var request = new SigninRequest { User = new User { UserName = newUser.UserName, Password = newUser.Password } };
+
+            var rest = new RestWrapper();
+            var result = await rest.Post<OAuthToken>(Service.Signin, AuthTokenType.None, request);
+            if (!(result is Error))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

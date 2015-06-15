@@ -84,7 +84,7 @@ namespace Citrus.SampleApp
             {
                 loginStatus.Text = string.Empty;
                 LoadingBar.Visibility = Visibility.Visible;
-                if (await Session.SigninUser("user5@email.com", "temp#123"))
+                if (await Session.SigninUser("user7@gmail.com", "password#123"))
                 {
                     loginStatus.Text = "Signed In";
                     new MessageDialog("User signed in successfully").ShowAsync();
@@ -313,10 +313,15 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                BindResultPanel.DataContext = await Session.BindUser("user7@gmail.com", "9876543210");
-                
-                await Wallet.GetMerchantPaymentOptions();
-                await Wallet.GetWallet();
+                var success = await Session.LinkUser("user7@gmail.com", "9876543210");
+                if (success)
+                {
+                    new MessageDialog("User Already A Citrus Member. Please Sign In User.").ShowAsync();
+                }
+                else
+                {
+                    new MessageDialog("User Not A Citrus Member. Please Sign Up User.").ShowAsync();
+                }
             }
             catch (ServiceException exception)
             {
