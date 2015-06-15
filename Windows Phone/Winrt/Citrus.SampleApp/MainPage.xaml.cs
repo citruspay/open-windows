@@ -308,13 +308,13 @@ namespace Citrus.SampleApp
             }
         }
 
-        private async void IsCitrusUser_OnClick(object sender, RoutedEventArgs e)
+        private async void IsCitrusMember_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                var success = await Session.IsCitrusUser("user7@gmail.com", "9876543210");
-                if (success)
+                var isCitrusMember = await Session.IsCitrusMemeber("user7@gmail.com", "9876543210");
+                if (isCitrusMember)
                 {
                     new MessageDialog("User Already A Citrus Member. Please Sign In User.").ShowAsync();
                 }
