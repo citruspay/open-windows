@@ -360,7 +360,7 @@ namespace Citrus.SDK
             return null;
         }
 
-        public static async Task<bool> LinkUser(string email, string mobile)
+        public static async Task<bool> IsCitrusUser(string email, string mobile)
         {
             var newUser = await BindUser(email, mobile);
             var randomPasswordGenerator = new RandomPasswordGenerator();

@@ -308,12 +308,12 @@ namespace Citrus.SampleApp
             }
         }
 
-        private async void BindUser_OnClick(object sender, RoutedEventArgs e)
+        private async void IsCitrusUser_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                var success = await Session.LinkUser("user7@gmail.com", "9876543210");
+                var success = await Session.IsCitrusUser("user7@gmail.com", "9876543210");
                 if (success)
                 {
                     new MessageDialog("User Already A Citrus Member. Please Sign In User.").ShowAsync();

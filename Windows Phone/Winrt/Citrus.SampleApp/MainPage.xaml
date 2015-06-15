@@ -86,13 +86,13 @@
                 </Grid>
             </PivotItem>
 
-            <PivotItem Header="Link User">
+            <PivotItem Header="Check User">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Link" Click="BindUser_OnClick"></Button>
+                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Link" Click="IsCitrusUser_OnClick"></Button>
                 </Grid>
             </PivotItem>
             <PivotItem Header="Wallet">
