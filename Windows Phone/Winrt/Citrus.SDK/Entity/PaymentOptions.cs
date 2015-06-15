@@ -5,13 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Citrus.SDK.Common;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 namespace Citrus.SDK.Entity
 {
     public class PaymentOption
     {
         [JsonProperty("type")]
-        public string Type
+        internal string Type
         {
             get { return this.CardType.GetEnumDescription(); }
             set
@@ -36,30 +38,93 @@ namespace Citrus.SDK.Entity
         [JsonProperty("number")]
         public string CardNumber { get; set; }
 
+        //[JsonProperty("expiryDate")]
+        //public string ExpiryDate { get; set; }
+
         [JsonProperty("expiryDate")]
-        public string ExpiryDate { get; set; }
+        internal string CardExpiryDate
+        {
+            get
+            {
+                return string.Format("{0}/{1}", this.ExpiryDate.Month < 10 ? "0" + this.ExpiryDate.Month : this.ExpiryDate.Month.ToString(CultureInfo.InvariantCulture), this.ExpiryDate.Year);
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var splits = value.ToString();
+                    this.ExpiryDate = new CardExpiry()
+                    {
+                        Month = Convert.ToInt16(splits.Substring(0, 2)),
+                        Year = Convert.ToInt16(splits.Substring(2, 4))
+                    };
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public CardExpiry ExpiryDate { get; set; }
+
+        [JsonProperty("scheme")]
+        internal string Scheme
+        {
+            get
+            {
+                return this.CardScheme != CreditCardType.Unknown ? this.CardScheme.GetEnumDescription() : "";
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    this.CardScheme = (CreditCardType)Enum.Parse(typeof(CreditCardType), value, true);
+                }
+                else
+                    this.CardScheme = CreditCardType.Unknown;
+            }
+        }
 
         [JsonProperty("bank")]
         public string Bank { get; set; }
 
-        [JsonProperty("scheme")]
-        public string Scheme { get; set; }
-
         [JsonProperty("mmid")]
-        public object MMID { get; set; }
+        public string MMID { get; set; }
 
         [JsonProperty("impsRegisteredMobile")]
-        public object IMPSRegisteredMobile { get; set; }
+        public string IMPSRegisteredMobile { get; set; }
 
         [JsonIgnore]
         public CreditCardType CardScheme
         {
-            get
+            get;
+            set;
+        }
+
+        public JObject ToJson()
+        {
+            var paymentOption = new JObject();
+
+            if (!string.IsNullOrEmpty(this.Name))
             {
-                if (!string.IsNullOrEmpty(Scheme))
-                    return (CreditCardType)Enum.Parse(typeof(CreditCardType), Scheme, true);
-                return CreditCardType.Unknown;
+                paymentOption["name"] = this.Name;
             }
+
+            if (this.CardType != CardType.UnKnown)
+            {
+                paymentOption["owner"] = this.CardHolder;
+                paymentOption["number"] = this.CardNumber;
+                paymentOption["scheme"] = this.Scheme;
+                paymentOption["expiryDate"] = this.CardExpiryDate;
+                paymentOption["type"] = this.Type;
+            }
+            else
+            {
+                paymentOption["owner"] = string.Empty;
+                paymentOption["bank"] = this.Bank;
+                paymentOption["mmid"] = this.MMID;
+                paymentOption["impsRegisteredMobile"] = this.IMPSRegisteredMobile;
+                paymentOption["type"] = "netbanking";
+            }
+            return paymentOption;
         }
     }
 }

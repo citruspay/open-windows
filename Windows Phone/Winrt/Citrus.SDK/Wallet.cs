@@ -11,6 +11,7 @@ namespace Citrus.SDK
 
     using Citrus.SDK.Common;
     using Citrus.SDK.Entity;
+    using Newtonsoft.Json.Linq;
 
     public static class Wallet
     {
@@ -125,6 +126,34 @@ namespace Citrus.SDK
             }
 
             Utility.ParseAndThrowError(((Error)paymentOptions).Response);
+        }
+
+        public static async Task<bool> SavePaymentOptions(IEnumerable<PaymentOption> paymentOptions)
+        {
+            var signInToken = await Session.GetAuthTokenAsync(AuthTokenType.SignIn);
+            if (string.IsNullOrEmpty(signInToken))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
+            }
+
+            RestWrapper restWrapper = new RestWrapper();
+            var request = new JObject();
+            request["type"] = "payment";
+
+            var paymentOptionsList = new JArray();
+
+            foreach (var option in paymentOptions)
+            {
+                paymentOptionsList.Add(option.ToJson());
+            }
+
+            request["paymentOptions"] = paymentOptionsList;
+
+            var json = request.ToString();
+
+            var response = await restWrapper.Put(Service.Wallet, json, AuthTokenType.SignIn);
+
+            return response.IsSuccessStatusCode;
         }
     }
 }

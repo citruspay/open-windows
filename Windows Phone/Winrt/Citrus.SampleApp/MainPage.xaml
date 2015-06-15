@@ -101,10 +101,14 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Button Content="Get Merchant Payment Options" Click="GetMerchantPaymentOptions_OnClick"></Button>
-                    <Button Content="Get User Payment Options" Grid.Row="1" Click="GetWallet_OnClick"></Button>  
-                    <ListBox x:Name="UserPaymentOptionsListBox" Grid.Row="2">
+                    
+                    <Button Content="Save Payment Options" Click="SavePayment_OnClick"></Button>
+                    
+                    <Button Content="Get Merchant Payment Options" Grid.Row="1"  Click="GetMerchantPaymentOptions_OnClick"></Button>
+                    <Button Content="Get User Payment Options" Grid.Row="2" Click="GetWallet_OnClick"></Button>  
+                    <ListBox x:Name="UserPaymentOptionsListBox" Grid.Row="3">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>

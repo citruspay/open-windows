@@ -57,7 +57,7 @@ namespace Citrus.SampleApp
             {
                 ResultPanel.DataContext = null;
                 LoadingBar.Visibility = Visibility.Visible;
-                ResultPanel.DataContext = await Session.SignupUser("user7@gmail.com", "9876543210", "password#123");
+                ResultPanel.DataContext = await Session.SignupUser("user777@gmail.com", "9876543210", "password#123");
                 new MessageDialog("User signed up successfully").ShowAsync();
             }
             catch (ServiceException exception)
@@ -84,7 +84,7 @@ namespace Citrus.SampleApp
             {
                 loginStatus.Text = string.Empty;
                 LoadingBar.Visibility = Visibility.Visible;
-                if (await Session.SigninUser("user7@gmail.com", "password#123"))
+                if (await Session.SigninUser("user777@gmail.com", "password#123"))
                 {
                     loginStatus.Text = "Signed In";
                     new MessageDialog("User signed in successfully").ShowAsync();
@@ -313,7 +313,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                var isCitrusMember = await Session.IsCitrusMemeber("user7@gmail.com", "9876543210");
+                var isCitrusMember = await Session.IsCitrusMemeber("user777@gmail.com", "9876543210");
                 if (isCitrusMember)
                 {
                     new MessageDialog("User Already A Citrus Member. Please Sign In User.").ShowAsync();
@@ -372,7 +372,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                UserPaymentOptionsListBox.ItemsSource= await Wallet.GetWallet();
+                UserPaymentOptionsListBox.ItemsSource = await Wallet.GetWallet();
             }
             catch (ServiceException exception)
             {
@@ -391,5 +391,80 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Collapsed;
             }
         }
+
+        private async void SavePayment_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var success = await Wallet.SavePaymentOptions(
+                            new List<PaymentOption>()
+                            {
+                                //Debit card
+                                new PaymentOption()
+                                {
+                                    CardType=CardType.Debit,
+                                    CardNumber="4242424242424242",
+                                    CardHolder="DCPearson Charles",
+                                    CardScheme=CreditCardType.Visa,
+                                    ExpiryDate=new CardExpiry()
+                                    {
+                                        Month = 12,
+                                        Year = 2018
+                                    },
+                                    Name="MyDebitCard"                             
+                                },
+                                //Credit card
+                                new PaymentOption()
+                                {
+                                    CardType=CardType.Credit,
+                                    CardNumber="4242424242424242",
+                                    CardHolder="CCPearson Charles",
+                                    CardScheme=CreditCardType.Visa,
+                                    ExpiryDate=new CardExpiry()
+                                    {
+                                        Month = 12,
+                                        Year = 2018
+                                    },
+                                    Name="MyCreditCard"                             
+                                },
+                                //Netbanking
+                                new PaymentOption()
+                                {
+                                    Bank="HDFC Bank",
+                                    MMID="123456",
+                                    IMPSRegisteredMobile = "9876543210"
+                                }
+                            }
+                            );
+                if (success)
+                {
+                    new MessageDialog("Payment option(s) saved successfully").ShowAsync();
+                }
+                else
+                {
+                    new MessageDialog("Failed to save Payment option(s)").ShowAsync();
+                }
+
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+
     }
 }

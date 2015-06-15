@@ -197,6 +197,14 @@ namespace Citrus.SDK.Common
             return await this.ReturnError(response);
         }
 
+        public async Task<HttpResponseMessage> Put(string relativeServicePath, string jsonToPost, AuthTokenType authTokenType)
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+            var content = new StringContent(jsonToPost, Encoding.UTF8, "application/json");
+            return await client.PutAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
+        }
+
         #endregion
 
         #region Methods
