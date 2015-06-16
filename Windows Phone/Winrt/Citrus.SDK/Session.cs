@@ -305,7 +305,7 @@ namespace Citrus.SDK
             return false;
         }
 
-        internal static async Task<User> BindUser(string email, string mobile)
+        public static async Task<User> BindUser(string email, string mobile)
         {
             if (string.IsNullOrEmpty(Config.SignUpId) || string.IsNullOrEmpty(Config.SignUpSecret))
             {
