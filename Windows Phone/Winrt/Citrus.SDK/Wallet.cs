@@ -157,5 +157,35 @@ namespace Citrus.SDK
 
             return response.IsSuccessStatusCode;
         }
+
+        public static async Task<bool> DeletePaymentOption(PaymentOption paymentOption)
+        {
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
+
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("User is not logged in to perform the action: Delete Payment option");
+            }
+
+            if (paymentOption == null)
+            {
+                return false;
+            }
+
+            RestWrapper restWrapper = new RestWrapper();
+            if (paymentOption.CardType != CardType.UnKnown)
+            {
+                var response = await restWrapper.Delete(Service.Wallet + "/" + paymentOption.CardNumber.Substring(12, 4) + ":" + paymentOption.Scheme, AuthTokenType.Simple);
+                return response.IsSuccessStatusCode;
+            }
+            else
+            {
+                var response = await restWrapper.Delete(Service.Wallet + "/" + paymentOption.Token, AuthTokenType.Simple);
+                return response.IsSuccessStatusCode;
+            }
+
+            return false;
+        }
     }
 }

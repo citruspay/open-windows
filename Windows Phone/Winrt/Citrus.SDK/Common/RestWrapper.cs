@@ -205,6 +205,13 @@ namespace Citrus.SDK.Common
             return await client.PutAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
         }
 
+        public async Task<HttpResponseMessage> Delete(string relativeServicePath, AuthTokenType authTokenType)
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));            
+            return await client.DeleteAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath);
+        }
+
         #endregion
 
         #region Methods

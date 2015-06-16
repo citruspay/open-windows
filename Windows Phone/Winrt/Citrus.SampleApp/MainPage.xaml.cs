@@ -418,7 +418,7 @@ namespace Citrus.SampleApp
                                 new PaymentOption()
                                 {
                                     CardType=CardType.Credit,
-                                    CardNumber="4242424242424242",
+                                    CardNumber="4242424242424241",
                                     CardHolder="CCPearson Charles",
                                     CardScheme=CreditCardType.Visa,
                                     ExpiryDate=new CardExpiry()
@@ -465,6 +465,39 @@ namespace Citrus.SampleApp
             }
         }
 
+        private async void DeletePaymentOption_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var success = await Wallet.DeletePaymentOption(UserPaymentOptionsListBox.SelectedItem as PaymentOption);
+                if (success)
+                {
+                    new MessageDialog("Payment option deleted successfully").ShowAsync();
+                    GetWallet_OnClick(null, null);                    
+                }
+                else
+                {
+                    new MessageDialog("Failed to delete Payment option").ShowAsync();
+                }
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
 
     }
 }
