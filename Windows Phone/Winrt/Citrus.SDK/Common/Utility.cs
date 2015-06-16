@@ -57,6 +57,7 @@ namespace Citrus.SDK.Common
 
         public const string SignUpTokenKey = "SignUpToken";
         public const string SignInTokenKey = "SignInToken";
+        public const string SimpleTokenKey = "SimpleToken";
         public const string ConfigKey = "CitrusMerchantConfig";
 
         #endregion
@@ -151,6 +152,11 @@ namespace Citrus.SDK.Common
             if (storageSettings.Values.ContainsKey(SignUpTokenKey))
             {
                 storageSettings.Values.Remove(SignUpTokenKey);
+            }
+
+            if (storageSettings.Values.ContainsKey(SimpleTokenKey))
+            {
+                storageSettings.Values.Remove(SimpleTokenKey);
             }
 
             if (storageSettings.Values.ContainsKey(ConfigKey))

@@ -82,14 +82,15 @@ namespace Citrus.SDK
 
         public static async Task<List<PaymentOption>> GetWallet()
         {
-            var signInToken = await Session.GetAuthTokenAsync(AuthTokenType.SignIn);
-            if (string.IsNullOrEmpty(signInToken))
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
+            if (string.IsNullOrEmpty(token))
             {
                 throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
             }
 
             var restWrapper = new RestWrapper();
-            var response = await restWrapper.Get<UserWallet>(Service.Wallet, AuthTokenType.SignIn);
+            var response = await restWrapper.Get<UserWallet>(Service.Wallet, AuthTokenType.Simple);
             var options = new List<PaymentOption>();
             if (!(response is Error))
             {
@@ -117,7 +118,7 @@ namespace Citrus.SDK
             var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMerchantPaymentOptions, new List<KeyValuePair<string, string>>()
             {
                 new KeyValuePair<string, string>("vanity",Session.Config.Vanity)
-            }, AuthTokenType.SignIn);
+            }, AuthTokenType.Simple);
 
             if (!(paymentOptions is Error))
             {
@@ -130,8 +131,9 @@ namespace Citrus.SDK
 
         public static async Task<bool> SavePaymentOptions(IEnumerable<PaymentOption> paymentOptions)
         {
-            var signInToken = await Session.GetAuthTokenAsync(AuthTokenType.SignIn);
-            if (string.IsNullOrEmpty(signInToken))
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
+            if (string.IsNullOrEmpty(token))
             {
                 throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
             }
@@ -151,7 +153,7 @@ namespace Citrus.SDK
 
             var json = request.ToString();
 
-            var response = await restWrapper.Put(Service.Wallet, json, AuthTokenType.SignIn);
+            var response = await restWrapper.Put(Service.Wallet, json, AuthTokenType.Simple);
 
             return response.IsSuccessStatusCode;
         }

@@ -42,6 +42,9 @@ namespace Citrus.SDK
         /// </summary>
         internal static OAuthToken signInToken;
 
+
+        internal static OAuthToken simpleToken;
+
         /// <summary>
         /// Session User
         /// </summary>
@@ -71,6 +74,8 @@ namespace Citrus.SDK
                     return signInToken != null ? await signInToken.GetActiveTokenAsync() : string.Empty;
                 case AuthTokenType.SignUp:
                     return signUpToken != null ? await signUpToken.GetActiveTokenAsync() : string.Empty;
+                case AuthTokenType.Simple:
+                    return simpleToken != null ? await simpleToken.GetActiveTokenAsync() : string.Empty;
                 default:
                     return string.Empty;
             }
@@ -90,6 +95,12 @@ namespace Citrus.SDK
                 if (signUpToken != null)
                     await signUpToken.GetActiveTokenAsync();
             }
+            else if (authTokenType == AuthTokenType.Simple && simpleToken == null)
+            {
+                simpleToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.SimpleTokenKey);
+                if (simpleToken != null)
+                    await simpleToken.GetActiveTokenAsync();
+            }
         }
 
         /// <summary>
@@ -100,15 +111,15 @@ namespace Citrus.SDK
         /// </returns>
         public static async Task<User> GetBalance()
         {
-            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+            await GetTokenIfEmptyAsync(AuthTokenType.Simple);
 
-            if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
+            if (simpleToken == null || string.IsNullOrEmpty(simpleToken.AccessToken))
             {
                 throw new UnauthorizedAccessException("User is not logged to perform Get Balance");
             }
 
             var rest = new RestWrapper();
-            var result = await rest.Get<User>(Service.GetBalance, AuthTokenType.SignIn);
+            var result = await rest.Get<User>(Service.GetBalance, AuthTokenType.Simple);
 
             if (!(result is Error))
             {
@@ -182,7 +193,9 @@ namespace Citrus.SDK
             if (!(result is Error))
             {
                 signInToken = result as OAuthToken;
+                simpleToken = result as OAuthToken;
                 Utility.SaveToLocalStorage(Utility.SignInTokenKey, signInToken);
+                Utility.SaveToLocalStorage(Utility.SimpleTokenKey, simpleToken);
                 return signInToken != null && !string.IsNullOrEmpty(signInToken.AccessToken);
             }
 
@@ -344,7 +357,9 @@ namespace Citrus.SDK
 
                     if (!(authTokenResult is Error))
                     {
-                        signInToken = authTokenResult as OAuthToken;
+                        signInToken = null;
+                        Utility.RemoveEntry(Utility.SignInTokenKey);
+                        simpleToken = authTokenResult as OAuthToken;
                         return user;
                     }
 
@@ -413,6 +428,7 @@ namespace Citrus.SDK
         {
             signInToken = new OAuthToken();
             signUpToken = new OAuthToken();
+            simpleToken = new OAuthToken();
             user = new User();
             Utility.RemoveAllEntries();
         }

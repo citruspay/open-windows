@@ -53,7 +53,9 @@ namespace Citrus.SDK.Common
         /// <summary>
         ///     Sign Up Token Type
         /// </summary>
-        SignUp
+        SignUp,
+
+        Simple
     }
 
     public enum CardType
