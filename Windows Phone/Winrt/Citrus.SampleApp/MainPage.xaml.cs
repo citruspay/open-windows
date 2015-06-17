@@ -499,5 +499,47 @@ namespace Citrus.SampleApp
             }
         }
 
+        private async void WithdrawMoneyOption_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var result = await Wallet.WithdrawMoney(new WithdrawMoneyRequest()
+                {
+                    Account = "042401523201",
+                    Amount = 1.00,
+                    Currency = "INR",
+                    IFSC_Code = "ICIC0000424",
+                    Owner = "Salil Godbole"
+
+                });
+                if (result.Status != "FAILED")
+                {
+                    new MessageDialog("Amount withdrawn successfully.").ShowAsync();
+                   
+                }
+                else
+                {
+                    new MessageDialog("Failed to withdraw amount due to " + result.Reason).ShowAsync();
+                }
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
     }
 }

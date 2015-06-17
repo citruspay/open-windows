@@ -188,10 +188,12 @@ namespace Citrus.SDK.Common
             if (response.IsSuccessStatusCode)
             {
                 var serializer = new JsonSerializer();
-                return
+                var responseString = new StringReader(await response.Content.ReadAsStringAsync());
+                var resp =
                     (IEntity)
                     serializer.Deserialize<T>(
-                        new JsonTextReader(new StringReader(await response.Content.ReadAsStringAsync())));
+                        new JsonTextReader(responseString));
+                return resp;
             }
 
             return await this.ReturnError(response);
@@ -210,6 +212,13 @@ namespace Citrus.SDK.Common
             var client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));            
             return await client.DeleteAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath);
+        }
+
+        public async Task<HttpResponseMessage> WithdrawMoney(string relativeServicePath, AuthTokenType authTokenType, HttpContent httpContent)
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+            return await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, httpContent);
         }
 
         #endregion

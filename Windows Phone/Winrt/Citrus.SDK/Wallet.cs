@@ -187,5 +187,37 @@ namespace Citrus.SDK
 
             return false;
         }
+
+        public static async Task<WithdrawMoneyResponse> WithdrawMoney(WithdrawMoneyRequest withdrawMoneyRequest)
+        {
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
+
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("User is not logged in to perform the action: Delete Payment option");
+            }
+
+            if (withdrawMoneyRequest == null)
+            {
+                return null;
+            }
+
+            RestWrapper restWrapper = new RestWrapper();
+
+            var response =
+                await
+                    restWrapper.Post<WithdrawMoneyResponse>(Service.WithdrawMoney,
+                        new List<KeyValuePair<string, string>>()
+                        {
+                            new KeyValuePair<string, string>("amount", withdrawMoneyRequest.Amount.ToString()),
+                            new KeyValuePair<string, string>("currency", "INR"),
+                            new KeyValuePair<string, string>("owner", withdrawMoneyRequest.Owner.ToString()),
+                            new KeyValuePair<string, string>("account", withdrawMoneyRequest.Account),
+                            new KeyValuePair<string, string>("ifsc", withdrawMoneyRequest.IFSC_Code)
+                        }, AuthTokenType.Simple) as WithdrawMoneyResponse;
+
+            return response;
+        }
     }
 }
