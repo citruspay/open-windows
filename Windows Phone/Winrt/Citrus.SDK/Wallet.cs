@@ -17,7 +17,7 @@ namespace Citrus.SDK
     {
         private static MerchantPaymentOptions merchantPaymentOptions;
 
-        private static async Task<PrepaidBill> GetPrepaidBillAsync(int amount, string currencyType, string redirectUrl)
+        private static async Task<PrepaidBill> GetPrepaidBillAsync(double amount, string currencyType, string redirectUrl)
         {
             var restWrapper = new RestWrapper();
             var result =
@@ -212,12 +212,18 @@ namespace Citrus.SDK
                         {
                             new KeyValuePair<string, string>("amount", withdrawMoneyRequest.Amount.ToString()),
                             new KeyValuePair<string, string>("currency", "INR"),
-                            new KeyValuePair<string, string>("owner", withdrawMoneyRequest.Owner.ToString()),
-                            new KeyValuePair<string, string>("account", withdrawMoneyRequest.Account),
-                            new KeyValuePair<string, string>("ifsc", withdrawMoneyRequest.IFSC_Code)
-                        }, AuthTokenType.Simple) as WithdrawMoneyResponse;
+                            new KeyValuePair<string, string>("owner", withdrawMoneyRequest.AccoutnHolderName),
+                            new KeyValuePair<string, string>("account", withdrawMoneyRequest.AccountNo),
+                            new KeyValuePair<string, string>("ifsc", withdrawMoneyRequest.IFSC)
+                        }, AuthTokenType.Simple);
 
-            return response;
+            if (!(response is Error))
+            {
+                return response as WithdrawMoneyResponse;
+            }
+
+            Utility.ParseAndThrowError(((Error)response).Response);
+            return null;
         }
     }
 }

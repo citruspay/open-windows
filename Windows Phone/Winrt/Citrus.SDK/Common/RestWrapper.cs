@@ -246,6 +246,11 @@ namespace Citrus.SDK.Common
                 throw new ServiceException("Server is down at this time, Please try again later.");
             }
 
+            if(response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new ServiceException("User is not logged in to perform this operation");
+            }
+
             throw new ServiceException("Something went wrong");
         }
 

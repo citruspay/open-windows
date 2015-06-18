@@ -4,8 +4,19 @@
 
     public class Amount
     {
+        private double value;
         [JsonProperty("value")]
-        public int Value { get; set; }
+        public double Value
+        {
+            get
+            {
+                return value;
+            }
+            set
+            {
+                this.value = value;
+            }
+        }
 
         [JsonProperty("currency")]
         public string CurrencyType { get; set; }

@@ -506,11 +506,10 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 var result = await Wallet.WithdrawMoney(new WithdrawMoneyRequest()
                 {
-                    Account = "042401523201",
-                    Amount = 1.00,
-                    Currency = "INR",
-                    IFSC_Code = "ICIC0000424",
-                    Owner = "Salil Godbole"
+                    AccountNo = "042401523201",
+                    Amount = 1,                 
+                    IFSC = "ICIC0000424",
+                    AccoutnHolderName = "Salil Godbole"
 
                 });
                 if (result.Status != "FAILED")
