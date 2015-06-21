@@ -1,12 +1,17 @@
-﻿namespace Citrus.SDK.Entity
-{
-    using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-    public class Amount
+namespace Citrus.SDK.Entity
+{
+    public class Balance
     {
-        private int value;
+        private double value;
         [JsonProperty("value")]
-        public int Value
+        public double Value
         {
             get
             {

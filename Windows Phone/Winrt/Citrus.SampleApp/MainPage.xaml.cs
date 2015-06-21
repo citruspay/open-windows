@@ -500,47 +500,53 @@ namespace Citrus.SampleApp
             }
         }
 
+        private async void WithdrawMoneyOption_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var result = await Wallet.WithdrawMoney(new WithdrawMoneyRequest()
+                {
+                    AccountNo = "042401523201",
+                    Amount = 1,                 
+                    IFSC = "ICIC0000424",
+                    AccoutnHolderName = "Salil Godbole"
+
+                });
+                if (result.Status != "FAILED")
+                {
+                    new MessageDialog("Amount withdrawn successfully.").ShowAsync();
+                   
+                }
+                else
+                {
+                    new MessageDialog("Failed to withdraw amount due to " + result.Reason).ShowAsync();
+                }
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private async Task<PaymentBill> GetBillAsync()
         {
             return await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
             {
                 Value = 2
             });
-        }
-
-        private async Task<Transaction> Payment()
-        {
-            var bill = await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
-            {
-                Value = 2
-            });
-
-            var payment = new CardPayment()
-            {
-                PaymentType = PaymentType.Card,
-                Card = new Card()
-                {
-                    AccountHolderName = "Tony Stark",
-                    CVV = "000",
-                    ExpiryDate =
-                        new CardExpiry()
-                        {
-                            Month = 11,
-                            Year = 2021
-                        },
-                    CardNumber = "4111111111111111",
-                    CardType = CardType.Debit
-                }
-            };
-
-            PaymentGateway pg = new PaymentGateway(bill, payment, UserDetails);
-
-            return await pg.ProcessPaymentAsync();
-
-            if (UserDetails != null)
-            {
-
-            }
         }
 
         private async void CardPayment_OnClick(object sender, RoutedEventArgs e)

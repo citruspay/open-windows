@@ -325,6 +325,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Button Content="Save Payment Options" Click="SavePayment_OnClick"></Button>
@@ -339,6 +340,7 @@
                         </ListView.ItemTemplate>
                     </ListView>
                     <Button Content="Delete Selected Payment Option" Grid.Row="4" Click="DeletePaymentOption_OnClick"></Button>
+                    <Button Content="Withdraw Money Option" Grid.Row="5" Click="WithdrawMoneyOption_OnClick"></Button>
                 </Grid>
             </PivotItem>
 

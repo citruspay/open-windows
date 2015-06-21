@@ -90,6 +90,7 @@
     <Compile Include="Common\Utility.cs" />
     <Compile Include="Entity\Address.cs" />
     <Compile Include="Entity\Amount.cs" />
+    <Compile Include="Entity\Balance.cs" />
     <Compile Include="Entity\Bill.cs" />
     <Compile Include="Entity\PaymentBill.cs" />
     <Compile Include="Entity\Card.cs" />
@@ -112,6 +113,8 @@
     <Compile Include="Entity\User.cs" />
     <Compile Include="Entity\UserDetails.cs" />
     <Compile Include="Entity\UserWallet.cs" />
+    <Compile Include="Entity\WithdrawMoneyRequest.cs" />
+    <Compile Include="Entity\WithdrawMoneyResponse.cs" />
     <Compile Include="PaymentGateway.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session.cs" />

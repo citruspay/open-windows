@@ -34,6 +34,7 @@ namespace Citrus.SDK
             billingUri.Query += ("amount=" + amount.Value);
 
             var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
             var response = await httpClient.GetAsync(billingUri.Uri);
 
             if (response.IsSuccessStatusCode)

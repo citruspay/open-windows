@@ -191,10 +191,12 @@ namespace Citrus.SDK.Common
             if (response.IsSuccessStatusCode)
             {
                 var serializer = new JsonSerializer();
-                return
+                var responseString = new StringReader(await response.Content.ReadAsStringAsync());
+                var resp =
                     (IEntity)
                     serializer.Deserialize<T>(
-                        new JsonTextReader(new StringReader(await response.Content.ReadAsStringAsync())));
+                        new JsonTextReader(responseString));
+                return resp;
             }
 
             return await this.ReturnError(response);
@@ -240,9 +242,9 @@ namespace Citrus.SDK.Common
                 throw new ServiceException("Server is down at this time, Please try again later.");
             }
 
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            if(response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                throw new UnauthorizedAccessException();
+                throw new ServiceException("User is not logged in to perform this operation");
             }
 
             throw new ServiceException("Something went wrong");
