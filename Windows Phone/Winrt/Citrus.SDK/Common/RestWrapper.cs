@@ -15,6 +15,9 @@
 //   Helper to support REST based operations
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
+using System;
+
 namespace Citrus.SDK.Common
 {
     using System.Collections.Generic;
@@ -235,6 +238,11 @@ namespace Citrus.SDK.Common
             if (response.StatusCode == HttpStatusCode.InternalServerError)
             {
                 throw new ServiceException("Server is down at this time, Please try again later.");
+            }
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException();
             }
 
             throw new ServiceException("Something went wrong");

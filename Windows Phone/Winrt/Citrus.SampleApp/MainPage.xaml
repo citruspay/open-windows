@@ -341,6 +341,21 @@
                     <Button Content="Delete Selected Payment Option" Grid.Row="4" Click="DeletePaymentOption_OnClick"></Button>
                 </Grid>
             </PivotItem>
+
+            <PivotItem Header="Payment">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Button Margin="15" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Card" Click="CardPayment_OnClick"></Button>
+                    <Button Margin="15" Grid.Row="1" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Token" Click="TokenPayment_OnClick"></Button>
+                    <Button Margin="15" Grid.Row="2" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Net Banking" Click="NetBankingPayment_OnClick"></Button>
+                    <Button Margin="15" Grid.Row="3" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Net Banking token" Click="NetBankingTokenPayment_OnClick"></Button>
+                </Grid>
+            </PivotItem>
         </Pivot>
 
         <ProgressBar Height="40" HorizontalAlignment="Stretch" Visibility="Collapsed" VerticalAlignment="Center" Name="LoadingBar" IsEnabled="True" Foreground="Red" IsIndeterminate="True"></ProgressBar>

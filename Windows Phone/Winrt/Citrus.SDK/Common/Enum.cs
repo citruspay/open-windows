@@ -65,7 +65,9 @@ namespace Citrus.SDK.Common
         [Value("debit")]
         Debit,
         [Value("credit")]
-        Credit
+        Credit,
+        [Value("prepaid")]
+        Prepaid
     }
 
     public enum PaymentType
@@ -75,7 +77,9 @@ namespace Citrus.SDK.Common
         [Value("paymentOptionIdToken")]
         Token,
         [Value("netbanking")]
-        NetBanking
+        NetBanking,
+        [Value("prepaid")]
+        Prepaid
     }
 
     public enum CreditCardType
@@ -95,6 +99,8 @@ namespace Citrus.SDK.Common
         [Value("JCB")]
         Jcb,
         [Value("UNKNOWN")]
-        Unknown
+        Unknown,
+        [Value("CPAY")]
+        Prepaid
     }
 }

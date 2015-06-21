@@ -54,12 +54,12 @@ namespace Citrus.SDK.Entity
         {
             get
             {
-                if (this.PaymentType != PaymentType.Token)
+                if (this.PaymentType != PaymentType.Token && this.PaymentType != PaymentType.Prepaid)
                 {
                     return PaymentType.Card.GetEnumDescription();
                 }
 
-                return PaymentType.Token.GetEnumDescription();
+                return this.PaymentType.GetEnumDescription();
             }
         }
 

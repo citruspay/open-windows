@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -474,7 +475,7 @@ namespace Citrus.SampleApp
                 if (success)
                 {
                     new MessageDialog("Payment option deleted successfully").ShowAsync();
-                    GetWallet_OnClick(null, null);                    
+                    GetWallet_OnClick(null, null);
                 }
                 else
                 {
@@ -499,5 +500,226 @@ namespace Citrus.SampleApp
             }
         }
 
+        private async Task<PaymentBill> GetBillAsync()
+        {
+            return await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
+            {
+                Value = 2
+            });
+        }
+
+        private async Task<Transaction> Payment()
+        {
+            var bill = await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
+            {
+                Value = 2
+            });
+
+            var payment = new CardPayment()
+            {
+                PaymentType = PaymentType.Card,
+                Card = new Card()
+                {
+                    AccountHolderName = "Tony Stark",
+                    CVV = "000",
+                    ExpiryDate =
+                        new CardExpiry()
+                        {
+                            Month = 11,
+                            Year = 2021
+                        },
+                    CardNumber = "4111111111111111",
+                    CardType = CardType.Debit
+                }
+            };
+
+            PaymentGateway pg = new PaymentGateway(bill, payment, UserDetails);
+
+            return await pg.ProcessPaymentAsync();
+
+            if (UserDetails != null)
+            {
+
+            }
+        }
+
+        private async void CardPayment_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var bill = await GetBillAsync();
+                var payment = new CardPayment()
+                {
+                    PaymentType = PaymentType.Card,
+                    Card = new Card()
+                    {
+                        AccountHolderName = "Tony Stark",
+                        CVV = "000",
+                        ExpiryDate =
+                            new CardExpiry()
+                            {
+                                Month = 11,
+                                Year = 2021
+                            },
+                        CardNumber = "4111111111111111",
+                        CardType = CardType.Debit
+                    }
+                };
+
+                var pg = new PaymentGateway(bill, payment, UserDetails);
+                var result = await pg.ProcessPaymentAsync();
+                if (result != null)
+                {
+                    new MessageDialog("Result Code:" + result.Code + ", Status: " + result.Status + ", Redirect URL:" + result.RedirectUrl).ShowAsync();
+                }
+                else
+                {
+                    new MessageDialog("Something went wrong").ShowAsync();
+                }
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void TokenPayment_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var bill = await GetBillAsync();
+                var payment = new TokenPayment()
+                {
+                    PaymentType = PaymentType.Token,
+                    TokenId = "e8c18a9aac39cfeb6f0d02f28ed4660b",
+                    CVV = "123"
+                };
+
+                var pg = new PaymentGateway(bill, payment, UserDetails);
+                var result = await pg.ProcessPaymentAsync();
+                if (result != null)
+                {
+                    new MessageDialog("Result Code:" + result.Code + ", Status: " + result.Status + ", Redirect URL:" + result.RedirectUrl).ShowAsync();
+                }
+                else
+                {
+                    new MessageDialog("Something went wrong").ShowAsync();
+                }
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void NetBankingPayment_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var bill = await GetBillAsync();
+                var payment = new NetBankingPayment()
+                {
+                    PaymentType = PaymentType.NetBanking,
+                    NetBanking = new NetBanking()
+                    {
+                        Code = "CID002"
+                    }
+                };
+
+                var pg = new PaymentGateway(bill, payment, UserDetails);
+                var result = await pg.ProcessPaymentAsync();
+                if (result != null)
+                {
+                    new MessageDialog("Result Code:" + result.Code + ", Status: " + result.Status + ", Redirect URL:" + result.RedirectUrl).ShowAsync();
+                }
+                else
+                {
+                    new MessageDialog("Something went wrong").ShowAsync();
+                }
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void NetBankingTokenPayment_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var bill = await GetBillAsync();
+                var payment = new TokenBankingPayment()
+                {
+                    TokenId = "48ec899d5dd14be93dce01038a8af60d"
+                };
+
+                var pg = new PaymentGateway(bill, payment, UserDetails);
+                var result = await pg.ProcessPaymentAsync();
+                if (result != null)
+                {
+                    new MessageDialog("Result Code:" + result.Code + ", Status: " + result.Status + ", Redirect URL:" + result.RedirectUrl).ShowAsync();
+                }
+                else
+                {
+                    new MessageDialog("Something went wrong").ShowAsync();
+                }
+            }
+            catch (ServiceException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (ArgumentException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
     }
 }

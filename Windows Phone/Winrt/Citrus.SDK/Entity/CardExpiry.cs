@@ -43,5 +43,10 @@
                 this._year = value;
             }
         }
+
+        public bool IsValid()
+        {
+            return DateTime.Now.Year < this.Year && DateTime.Now.Month < this.Month;
+        }
     }
 }
