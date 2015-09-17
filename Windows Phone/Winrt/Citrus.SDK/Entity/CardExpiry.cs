@@ -46,7 +46,12 @@
 
         public bool IsValid()
         {
-            return DateTime.Now.Year < this.Year && DateTime.Now.Month < this.Month;
+            if (DateTime.Now.Year < this.Year)
+                return true;
+            else if (DateTime.Now.Year == this.Year && DateTime.Now.Month < this.Month)
+                return true;
+            else
+                return false;
         }
     }
 }
