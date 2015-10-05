@@ -132,11 +132,11 @@ namespace Citrus.SDK
         public static async Task<bool> SavePaymentOptions(IEnumerable<PaymentOption> paymentOptions)
         {
             await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
-            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
-            if (string.IsNullOrEmpty(token))
-            {
-                throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
-            }
+            //var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
+            //if (string.IsNullOrEmpty(token))
+            //{
+            //    throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
+            //}
 
             RestWrapper restWrapper = new RestWrapper();
             var request = new JObject();
@@ -225,5 +225,56 @@ namespace Citrus.SDK
             Utility.ParseAndThrowError(((Error)response).Response);
             return null;
         }
+
+        public static async Task<string> GetCookie(string email, string password)
+        {
+            var restWrapper = new RestWrapper();
+            var result =
+                await restWrapper.PostNonRedirect(
+                    Service.GetCookies,
+                    AuthTokenType.None,
+                    new WebCookie()
+                    {
+                        Email = email,
+                        Password = password,
+                        RMCookie = "true"
+                    });
+
+            if (!result.IsSuccessStatusCode)
+            {
+                string Set_Cookie = ((string[])result.Headers.GetValues("Set-Cookie"))[0];
+                //Set_Cookie = Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20);
+                //Set_Cookie = Set_Cookie.Substring(0, Set_Cookie.IndexOf("; Expires="));
+
+                //Set_Cookie = Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20).Substring(0, Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20).IndexOf("; Expires="));
+                return Set_Cookie;
+            }
+
+            return null;
+        }
+
+        #region Payment Option
+
+        public static async Task GetLoadMoneyPaymentOptions()
+        {
+            string CitrusVanity = "prepaid";
+            RestWrapper restWrapper = new RestWrapper();
+            var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMerchantPaymentOptions, new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("vanity",CitrusVanity)
+            }, AuthTokenType.Simple);
+
+            if (!(paymentOptions is Error))
+            {
+                merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
+                return;
+            }
+
+            Utility.ParseAndThrowError(((Error)paymentOptions).Response);
+        }
+
+
+        #endregion
+
     }
 }

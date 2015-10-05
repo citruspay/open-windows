@@ -68,6 +68,30 @@ namespace Citrus.SDK.Common
             return new Error(await response.Content.ReadAsStringAsync());
         }
 
+        public async Task<IEntity> Put<T>(string relativeServicePath, AuthTokenType authTokenType, IEntity objectToPost = null, bool isRaw = false)
+        {
+            var client = new HttpClient();
+            HttpResponseMessage response;
+            if (authTokenType != AuthTokenType.None)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+
+            var serializer = new JsonSerializer();
+            var stringContent = new StringWriter();
+            serializer.Serialize(stringContent, objectToPost);
+            var content = new StringContent(stringContent.ToString(), Encoding.UTF8, "application/json");
+            response = await client.PutAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return
+                    (IEntity)
+                    serializer.Deserialize<T>(
+                        new JsonTextReader(new StringReader(await response.Content.ReadAsStringAsync())));
+            }
+
+            return await this.ReturnError(response);
+        }
+
         /// <summary>
         /// Get object from Service
         /// </summary>
@@ -84,8 +108,8 @@ namespace Citrus.SDK.Common
         {
             var client = new HttpClient();
             HttpResponseMessage response;
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+            if (authTokenType != AuthTokenType.None)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
 
             response = await client.GetAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath);
 
@@ -126,7 +150,8 @@ namespace Citrus.SDK.Common
             var client = new HttpClient();
             HttpResponseMessage response = null;
             var serializer = new JsonSerializer();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+            if (authTokenType != AuthTokenType.None)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
             if (!isRaw)
             {
                 if (objectToPost != null)
@@ -182,8 +207,8 @@ namespace Citrus.SDK.Common
         {
             var client = new HttpClient();
             HttpResponseMessage response;
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+            if (authTokenType != AuthTokenType.None)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
 
             var content = new FormUrlEncodedContent(urlParams);
             response = await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
@@ -205,7 +230,8 @@ namespace Citrus.SDK.Common
         public async Task<HttpResponseMessage> Put(string relativeServicePath, string jsonToPost, AuthTokenType authTokenType)
         {
             var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+            if (authTokenType != AuthTokenType.None)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
             var content = new StringContent(jsonToPost, Encoding.UTF8, "application/json");
             return await client.PutAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
         }
@@ -213,8 +239,128 @@ namespace Citrus.SDK.Common
         public async Task<HttpResponseMessage> Delete(string relativeServicePath, AuthTokenType authTokenType)
         {
             var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));            
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
             return await client.DeleteAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath);
+        }
+
+        public string Get_Cookie;
+        public async Task<IEntity> PostNonRedirect<T>(string relativeServicePath, AuthTokenType authTokenType, IEntity objectToPost = null, bool isRaw = false)
+        {
+            Get_Cookie = string.Empty;
+            HttpResponseMessage response = null;
+            var serializer = new JsonSerializer();
+
+            var handler = new HttpClientHandler()
+            {
+                AllowAutoRedirect = false
+            };
+
+            HttpClient client = new HttpClient(handler);
+            if (authTokenType != AuthTokenType.None)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+
+            if (!isRaw)
+            {
+                if (objectToPost != null)
+                {
+                    var content = new FormUrlEncodedContent(objectToPost.ToKeyValuePair());
+                    response =
+                        await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
+                }
+                else
+                {
+                    response =
+                        await
+                        client.PostAsync(
+                            Session.Config.Environment.GetEnumDescription() + relativeServicePath,
+                            new StringContent(string.Empty));
+                }
+            }
+            else
+            {
+                var stringContent = new StringWriter();
+                serializer.Serialize(stringContent, objectToPost);
+                var content = new StringContent(stringContent.ToString(), Encoding.UTF8, "application/json");
+                response = await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
+            }
+            if (response.IsSuccessStatusCode)
+            {
+                return
+                    (IEntity)
+                    serializer.Deserialize<T>(
+                        new JsonTextReader(new StringReader(await response.Content.ReadAsStringAsync())));
+            }
+            else
+            {
+                string Set_Cookie = ((string[])response.Headers.GetValues("Set-Cookie"))[0];
+                Set_Cookie = Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20);
+                Set_Cookie = Set_Cookie.Substring(0, Set_Cookie.IndexOf("; Expires="));
+
+                //Set_Cookie = Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20).Substring(0, Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20).IndexOf("; Expires="));
+                Get_Cookie = Set_Cookie;
+            }
+
+            return await this.ReturnError(response);
+        }
+
+        public async Task<HttpResponseMessage> PostNonRedirect(string relativeServicePath, AuthTokenType authTokenType, IEntity objectToPost = null)
+        {
+            Get_Cookie = string.Empty;
+            HttpResponseMessage response = null;
+            var serializer = new JsonSerializer();
+
+            var handler = new HttpClientHandler()
+            {
+                AllowAutoRedirect = false
+            };
+
+            HttpClient client = new HttpClient(handler);
+            if (authTokenType != AuthTokenType.None)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+
+            var content = new FormUrlEncodedContent(objectToPost.ToKeyValuePair());
+            response =
+                await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
+            return response;
+
+            //if (!response.IsSuccessStatusCode)
+            //{
+            //    string Set_Cookie = ((string[])response.Headers.GetValues("Set-Cookie"))[0];
+            //    Set_Cookie = Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20);
+            //    Set_Cookie = Set_Cookie.Substring(0, Set_Cookie.IndexOf("; Expires="));
+
+            //    //Set_Cookie = Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20).Substring(0, Set_Cookie.Substring(Set_Cookie.IndexOf("prepaiduser-payauth=") + 20).IndexOf("; Expires="));
+            //    return Set_Cookie;
+            //}
+
+            //return null;
+        }
+
+        public async Task<IEntity> Post<T>(string relativeServicePath, IEnumerable<KeyValuePair<string, string>> urlParams, AuthTokenType authTokenType, bool flag)
+        {
+            HttpResponseMessage response;
+            HttpClientHandler httpClientHandler = new HttpClientHandler();
+            httpClientHandler.AllowAutoRedirect = false;
+            using (HttpClient client = new HttpClient(httpClientHandler))
+            {
+                if (authTokenType != AuthTokenType.None)
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", await Session.GetAuthTokenAsync(authTokenType));
+                var content = new FormUrlEncodedContent(urlParams);
+                response = await client.PostAsync(Session.Config.Environment.GetEnumDescription() + relativeServicePath, content);
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                var serializer = new JsonSerializer();
+                var responseString = new StringReader(await response.Content.ReadAsStringAsync());
+                var resp =
+                    (IEntity)
+                    serializer.Deserialize<T>(
+                        new JsonTextReader(responseString));
+                return resp;
+            }
+
+            return await this.ReturnError(response);
         }
 
         #endregion
@@ -242,7 +388,7 @@ namespace Citrus.SDK.Common
                 throw new ServiceException("Server is down at this time, Please try again later.");
             }
 
-            if(response.StatusCode == HttpStatusCode.Unauthorized)
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 throw new ServiceException("User is not logged in to perform this operation");
             }

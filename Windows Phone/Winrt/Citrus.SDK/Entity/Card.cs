@@ -38,7 +38,10 @@ namespace Citrus.SDK.Entity
             set
             {
                 this._cardNumber = value;
-                this.CardScheme = Utility.GetCardTypeFromNumber(value);
+                if (this.CardType == CardType.Prepaid)
+                    this.CardScheme = CreditCardType.Prepaid;
+                else
+                    this.CardScheme = Utility.GetCardTypeFromNumber(value);
             }
         }
 
@@ -63,8 +66,19 @@ namespace Citrus.SDK.Entity
             }
         }
 
+        private CardType _CardType;
+
         [JsonIgnore]
-        public CardType CardType { get; set; }
+        public CardType CardType {
+            get {
+                return _CardType;
+            }
+            set {
+                _CardType = value;
+                if (this.CardType == CardType.Prepaid)
+                    this.CardScheme = CreditCardType.Prepaid;
+            } 
+        }
 
         [JsonProperty("expiry")]
         public string CardExpiryDate

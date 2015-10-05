@@ -45,20 +45,34 @@ namespace Citrus.SDK
             return null;
         }
 
+        public async Task<Transaction> ProcessPaymentAsync(string EmailId)
+        {
+            this._paymentMode = new CardPayment()
+            {
+                PaymentType = PaymentType.Prepaid,
+                Card = new Card()
+                {
+                    AccountHolderName = EmailId,
+                }
+            };
+
+            return await ProcessPaymentAsync();
+        }
+
         public async Task<Transaction> ProcessPaymentAsync()
         {
             await Session.GetTokenIfEmptyAsync(AuthTokenType.SignIn);
 
-            if (Session.signInToken == null || string.IsNullOrEmpty(Session.signInToken.AccessToken))
-            {
-                throw new UnauthorizedAccessException("User is not logged to perform this operation");
-            }
+            //if (Session.signInToken == null || string.IsNullOrEmpty(Session.signInToken.AccessToken))
+            //{
+            //    throw new UnauthorizedAccessException("User is not logged to perform this operation");
+            //}
 
             if (this._bill == null || this._paymentMode == null || this._user == null)
             {
                 throw new ArgumentException();
             }
-            
+
             if (!this._bill.IsValid())
             {
                 throw new ServiceException("Unable to get bill from server. Please try again.");
@@ -79,7 +93,7 @@ namespace Citrus.SDK
                 {
                     if (cardPayment.Card.CardScheme.HasValue && cardPayment.Card.CardScheme.Value == CreditCardType.Mtro)
                     {
-                        if(string.IsNullOrEmpty(cardPayment.Card.CVV))
+                        if (string.IsNullOrEmpty(cardPayment.Card.CVV))
                         {
                             cardPayment.Card.CVV = "123";
                         }
@@ -87,7 +101,8 @@ namespace Citrus.SDK
                         {
                             cardPayment.Card.ExpiryDate = new CardExpiry()
                             {
-                                Month = 11,Year = 2019 //Dummy value
+                                Month = 11,
+                                Year = 2019 //Dummy value
                             };
                         }
                     }
@@ -97,7 +112,7 @@ namespace Citrus.SDK
                     cardPayment.Card.CVV = "000";
                     cardPayment.Card.CardNumber = "1234561234561234";
                     cardPayment.Card.CardScheme = CreditCardType.Prepaid;
-                    cardPayment.Card.CardType=CardType.Prepaid;
+                    cardPayment.Card.CardType = CardType.Prepaid;
                     cardPayment.Card.ExpiryDate = new CardExpiry()
                     {
                         Month = 04,
@@ -113,7 +128,7 @@ namespace Citrus.SDK
             {
                 paymentMode = this._paymentMode;
             }
-            else if(this._paymentMode is TokenBankingPayment)
+            else if (this._paymentMode is TokenBankingPayment)
             {
                 paymentMode = this._paymentMode;
             }
@@ -156,9 +171,12 @@ namespace Citrus.SDK
             if (this._paymentMode is CardPayment)
             {
                 var card = this._paymentMode as CardPayment;
-                if (string.IsNullOrEmpty(card.Card.CardNumber) || !card.Card.IsValid())
+                if (card.PaymentType != PaymentType.Prepaid)
                 {
-                    throw new ArgumentException("Invalid card");
+                    if (string.IsNullOrEmpty(card.Card.CardNumber) || !card.Card.IsValid())
+                    {
+                        throw new ArgumentException("Invalid card");
+                    }
                 }
             }
             else if (this._paymentMode is TokenPayment)
@@ -190,5 +208,6 @@ namespace Citrus.SDK
 
             return true;
         }
+        
     }
 }
