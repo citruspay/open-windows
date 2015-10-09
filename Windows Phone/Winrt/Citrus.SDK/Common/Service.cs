@@ -89,6 +89,12 @@ namespace Citrus.SDK.Common
 
         public const string UpdateProfile = "service/um/profile/update";
 
+        public const string TransferMoneyUsingEmail = ServiceVersion + "prepayment/transfer";
+
+        public const string TransferMoneyUsingMobile = ServiceVersion + "prepayment/transfer/extended";
+
+        public const string GetWithdrawInfo = ServiceVersion + "profile/me/prepaid";
+
         #endregion
     }
 }

@@ -406,7 +406,7 @@
                 </Grid>
             </PivotItem>
 
-            <PivotItem Header="Load Money">
+            <PivotItem Header="Card Payment">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
@@ -462,7 +462,50 @@
                     <Button Margin="5" Grid.Row="6" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Update Profile" Click="UpdateProfile_OnClick"></Button>
                 </Grid>
             </PivotItem>
-            
+
+            <PivotItem Header="Transfer Money">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBox Name="txtTranToEmail" Margin="5" Grid.Row="0" Width="320" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" PlaceholderText="Email"/>
+                    <TextBox Name="txtTranToMobile" Margin="5" Grid.Row="1" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="9011094323" PlaceholderText="Mobile"/>
+                    <TextBox Name="txtTranAmount" Margin="5" Grid.Row="2" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="1" PlaceholderText="Amount"/>
+                    <TextBox Name="txtTranMessage" Margin="5" Grid.Row="3" Width="320" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="Test Message.." PlaceholderText="Message"/>
+                    
+                    <Button Margin="5" Height="70" Width="300" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Transfer Money using Email" Click="TranMoneyEmail_OnClick"></Button>
+                    <Button Margin="5" Height="70" Width="300" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Transfer Money using Mobile" Click="TranMoneyMobile_OnClick"></Button>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem Header="Withdraw Money">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBox Name="txtWithdrawOwner" Margin="5" Grid.Row="0" Width="320" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="mahesh mutyal" PlaceholderText="Owner"/>
+                    <TextBox Name="txtWithdrawBranch" Margin="5" Grid.Row="1" Width="320" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="HSBC0000123" PlaceholderText="Branch"/>
+                    <TextBox Name="txtWithdrawNumber" Margin="5" Grid.Row="2" Width="320" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="123456789987654" PlaceholderText="Number"/>
+                    <TextBox Name="txtWithdrawType" Margin="5" Grid.Row="3" Width="320" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="prepaid" PlaceholderText="Type"/>
+
+                    <Button Margin="5" Height="70" Width="300" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Save Withdraw Money" Click="SaveWithdrawMoney_OnClick"></Button>
+                    <Button Margin="5" Height="70" Width="300" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Get Withdraw Money Info" Click="GetWithdrawInfo_OnClick"></Button>
+                </Grid>
+            </PivotItem>
+
         </Pivot>
 
         <ProgressBar Height="40" HorizontalAlignment="Stretch" Visibility="Collapsed" VerticalAlignment="Center" Name="LoadingBar" IsEnabled="True" Foreground="Red" IsIndeterminate="True"></ProgressBar>

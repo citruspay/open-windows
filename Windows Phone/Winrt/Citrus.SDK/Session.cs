@@ -203,8 +203,6 @@ namespace Citrus.SDK
             return false;
         }
 
-
-
         /// <summary>
         /// Sign up an user account.
         /// </summary>
@@ -402,7 +400,7 @@ namespace Citrus.SDK
         /// </summary>
         /// <returns>
         /// </returns>
-        private static async Task GetSignupToken()
+        public static async Task GetSignupToken()
         {
             await GetTokenIfEmptyAsync(AuthTokenType.SignUp);
 

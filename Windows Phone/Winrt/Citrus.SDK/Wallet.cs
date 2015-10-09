@@ -12,10 +12,147 @@ namespace Citrus.SDK
     using Citrus.SDK.Common;
     using Citrus.SDK.Entity;
     using Newtonsoft.Json.Linq;
+    using Newtonsoft.Json;
+    using System.IO;
 
     public static class Wallet
     {
         private static MerchantPaymentOptions merchantPaymentOptions;
+
+        #region Save Cards
+
+        public static async Task<List<PaymentOption>> GetWallet()
+        {
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
+            }
+
+            var restWrapper = new RestWrapper();
+            var response = await restWrapper.Get<UserWallet>(Service.Wallet, AuthTokenType.Simple);
+            var options = new List<PaymentOption>();
+            if (!(response is Error))
+            {
+                var wallet = response as UserWallet;
+                if (wallet != null)
+                {
+                    if (merchantPaymentOptions != null)
+                    {
+                        //options.AddRange(wallet.PaymentOptions.Where(option => merchantPaymentOptions.ContainScheme(option.CardScheme, option.CardType, option.Bank)));
+                        options.AddRange(wallet.PaymentOptions);
+                        return options;
+                    }
+
+                    return wallet.PaymentOptions.ToList();
+                }
+                return null;
+            }
+
+            Utility.ParseAndThrowError(((Error)response).Response);
+            return null;
+        }
+
+        public static async Task<bool> SavePaymentOptions(IEnumerable<PaymentOption> paymentOptions)
+        {
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
+            //var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
+            //if (string.IsNullOrEmpty(token))
+            //{
+            //    throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
+            //}
+
+            RestWrapper restWrapper = new RestWrapper();
+            var request = new JObject();
+            request["type"] = "payment";
+
+            var paymentOptionsList = new JArray();
+
+            foreach (var option in paymentOptions)
+            {
+                paymentOptionsList.Add(option.ToJson());
+            }
+
+            request["paymentOptions"] = paymentOptionsList;
+
+            var json = request.ToString();
+
+            var response = await restWrapper.Put(Service.Wallet, json, AuthTokenType.Simple);
+
+            return response.IsSuccessStatusCode;
+        }
+
+        public static async Task<bool> DeletePaymentOption(PaymentOption paymentOption)
+        {
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
+
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("User is not logged in to perform the action: Delete Payment option");
+            }
+
+            if (paymentOption == null)
+            {
+                return false;
+            }
+
+            RestWrapper restWrapper = new RestWrapper();
+            if (paymentOption.CardType != CardType.UnKnown)
+            {
+                var response = await restWrapper.Delete(Service.Wallet + "/" + paymentOption.CardNumber.Substring(12, 4) + ":" + paymentOption.Scheme, AuthTokenType.Simple);
+                return response.IsSuccessStatusCode;
+            }
+            else
+            {
+                var response = await restWrapper.Delete(Service.Wallet + "/" + paymentOption.Token, AuthTokenType.Simple);
+                return response.IsSuccessStatusCode;
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        #region Payment Option
+
+        public static async Task GetLoadMoneyPaymentOptions()
+        {
+            string CitrusVanity = "prepaid";
+            RestWrapper restWrapper = new RestWrapper();
+            var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMerchantPaymentOptions, new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("vanity",CitrusVanity)
+            }, AuthTokenType.Simple);
+
+            if (!(paymentOptions is Error))
+            {
+                merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
+                return;
+            }
+
+            Utility.ParseAndThrowError(((Error)paymentOptions).Response);
+        }
+
+        public static async Task GetMerchantPaymentOptions()
+        {
+            RestWrapper restWrapper = new RestWrapper();
+            var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMerchantPaymentOptions, new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("vanity",Session.Config.Vanity)
+            }, AuthTokenType.Simple);
+
+            if (!(paymentOptions is Error))
+            {
+                merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
+                return;
+            }
+
+            Utility.ParseAndThrowError(((Error)paymentOptions).Response);
+        }
+
+        #endregion
 
         private static async Task<PrepaidBill> GetPrepaidBillAsync(double amount, string currencyType, string redirectUrl)
         {
@@ -79,115 +216,7 @@ namespace Citrus.SDK
             Utility.ParseAndThrowError(((Error)result).Response);
             return null;
         }
-
-        public static async Task<List<PaymentOption>> GetWallet()
-        {
-            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
-            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
-            if (string.IsNullOrEmpty(token))
-            {
-                throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
-            }
-
-            var restWrapper = new RestWrapper();
-            var response = await restWrapper.Get<UserWallet>(Service.Wallet, AuthTokenType.Simple);
-            var options = new List<PaymentOption>();
-            if (!(response is Error))
-            {
-                var wallet = response as UserWallet;
-                if (wallet != null)
-                {
-                    if (merchantPaymentOptions != null)
-                    {
-                        options.AddRange(wallet.PaymentOptions.Where(option => merchantPaymentOptions.ContainScheme(option.CardScheme, option.CardType, option.Bank)));
-                        return options;
-                    }
-
-                    return wallet.PaymentOptions.ToList();
-                }
-                return null;
-            }
-
-            Utility.ParseAndThrowError(((Error)response).Response);
-            return null;
-        }
-
-        public static async Task GetMerchantPaymentOptions()
-        {
-            RestWrapper restWrapper = new RestWrapper();
-            var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMerchantPaymentOptions, new List<KeyValuePair<string, string>>()
-            {
-                new KeyValuePair<string, string>("vanity",Session.Config.Vanity)
-            }, AuthTokenType.Simple);
-
-            if (!(paymentOptions is Error))
-            {
-                merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
-                return;
-            }
-
-            Utility.ParseAndThrowError(((Error)paymentOptions).Response);
-        }
-
-        public static async Task<bool> SavePaymentOptions(IEnumerable<PaymentOption> paymentOptions)
-        {
-            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
-            //var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
-            //if (string.IsNullOrEmpty(token))
-            //{
-            //    throw new UnauthorizedAccessException("User is not logged to perform the action: Get Wallet");
-            //}
-
-            RestWrapper restWrapper = new RestWrapper();
-            var request = new JObject();
-            request["type"] = "payment";
-
-            var paymentOptionsList = new JArray();
-
-            foreach (var option in paymentOptions)
-            {
-                paymentOptionsList.Add(option.ToJson());
-            }
-
-            request["paymentOptions"] = paymentOptionsList;
-
-            var json = request.ToString();
-
-            var response = await restWrapper.Put(Service.Wallet, json, AuthTokenType.Simple);
-
-            return response.IsSuccessStatusCode;
-        }
-
-        public static async Task<bool> DeletePaymentOption(PaymentOption paymentOption)
-        {
-            await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
-            var token = await Session.GetAuthTokenAsync(AuthTokenType.Simple);
-
-            if (string.IsNullOrEmpty(token))
-            {
-                throw new UnauthorizedAccessException("User is not logged in to perform the action: Delete Payment option");
-            }
-
-            if (paymentOption == null)
-            {
-                return false;
-            }
-
-            RestWrapper restWrapper = new RestWrapper();
-            if (paymentOption.CardType != CardType.UnKnown)
-            {
-                var response = await restWrapper.Delete(Service.Wallet + "/" + paymentOption.CardNumber.Substring(12, 4) + ":" + paymentOption.Scheme, AuthTokenType.Simple);
-                return response.IsSuccessStatusCode;
-            }
-            else
-            {
-                var response = await restWrapper.Delete(Service.Wallet + "/" + paymentOption.Token, AuthTokenType.Simple);
-                return response.IsSuccessStatusCode;
-            }
-
-            return false;
-        }
-
+        
         public static async Task<WithdrawMoneyResponse> WithdrawMoney(WithdrawMoneyRequest withdrawMoneyRequest)
         {
             await Session.GetTokenIfEmptyAsync(AuthTokenType.Simple);
@@ -195,7 +224,7 @@ namespace Citrus.SDK
 
             if (string.IsNullOrEmpty(token))
             {
-                throw new UnauthorizedAccessException("User is not logged in to perform the action: Delete Payment option");
+                throw new UnauthorizedAccessException("User is not logged in to perform the action: Withdraw Money");
             }
 
             if (withdrawMoneyRequest == null)
@@ -253,28 +282,120 @@ namespace Citrus.SDK
             return null;
         }
 
-        #region Payment Option
-
-        public static async Task GetLoadMoneyPaymentOptions()
+        public static async Task<TransferMoneyResponse> TransferMoneyUsingEmail(TransferMoneyRequest transferMoneyRequest)
         {
-            string CitrusVanity = "prepaid";
-            RestWrapper restWrapper = new RestWrapper();
-            var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMerchantPaymentOptions, new List<KeyValuePair<string, string>>()
-            {
-                new KeyValuePair<string, string>("vanity",CitrusVanity)
-            }, AuthTokenType.Simple);
+            await Session.GetSignupToken();
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.SignUp);
 
-            if (!(paymentOptions is Error))
+            if (string.IsNullOrEmpty(token))
             {
-                merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
-                return;
+                throw new UnauthorizedAccessException("User is not logged in to perform the action: Transfer Money");
             }
 
-            Utility.ParseAndThrowError(((Error)paymentOptions).Response);
+            if (transferMoneyRequest == null)
+            {
+                return null;
+            }
+
+            RestWrapper restWrapper = new RestWrapper();
+
+            var response =
+                await
+                    restWrapper.Post<TransferMoneyResponse>(Service.TransferMoneyUsingEmail,
+                        new List<KeyValuePair<string, string>>()
+                        {
+                            new KeyValuePair<string, string>("amount", transferMoneyRequest.Amount.ToString()),
+                            new KeyValuePair<string, string>("currency", transferMoneyRequest.Currency),
+                            new KeyValuePair<string, string>("to", transferMoneyRequest.To),
+                            new KeyValuePair<string, string>("currency", transferMoneyRequest.Currency),
+                            new KeyValuePair<string, string>("message", transferMoneyRequest.Message)
+                        }, AuthTokenType.SignUp);
+
+            if (!(response is Error))
+            {
+                return response as TransferMoneyResponse;
+            }
+
+            Utility.ParseAndThrowError(((Error)response).Response);
+            return null;
         }
 
+        public static async Task<TransferMoneyResponse> TransferMoneyUsingMobile(TransferMoneyRequest transferMoneyRequest)
+        {
+            await Session.GetSignupToken();
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.SignUp);
 
-        #endregion
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("User is not logged in to perform the action: Transfer Money");
+            }
+
+            if (transferMoneyRequest == null)
+            {
+                return null;
+            }
+
+            RestWrapper restWrapper = new RestWrapper();
+
+            var response =
+                await
+                    restWrapper.Post<TransferMoneyResponse>(Service.TransferMoneyUsingMobile,
+                        new List<KeyValuePair<string, string>>()
+                        {
+                            new KeyValuePair<string, string>("amount", transferMoneyRequest.Amount.ToString()),
+                            new KeyValuePair<string, string>("currency", transferMoneyRequest.Currency),
+                            new KeyValuePair<string, string>("to", transferMoneyRequest.To),
+                            new KeyValuePair<string, string>("currency", transferMoneyRequest.Currency),
+                            new KeyValuePair<string, string>("message", transferMoneyRequest.Message)
+                        }, AuthTokenType.SignUp);
+
+            if (!(response is Error))
+            {
+                return response as TransferMoneyResponse;
+            }
+
+            Utility.ParseAndThrowError(((Error)response).Response);
+            return null;
+        }
+
+        public static async Task<WithdrawInfoResponse> GetWithdrawInfo()
+        {
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.SignIn);
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Get Withdraw Info");
+            }
+
+            var restWrapper = new RestWrapper();
+            var response = await restWrapper.Get<WithdrawInfoResponse>(Service.GetWithdrawInfo, AuthTokenType.SignIn);
+            if (!(response is Error))
+            {
+                var wallet = response as WithdrawInfoResponse;
+                return wallet;
+            }
+
+            Utility.ParseAndThrowError(((Error)response).Response);
+            return null;
+        }
+
+        public static async Task<bool> SaveWithdrawInfo(WithdrawInfoResponse withdrawInfoResponse)
+        {
+            await Session.GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+            var token = await Session.GetAuthTokenAsync(AuthTokenType.SignIn);
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Save Withdraw Info");
+            }
+            RestWrapper rest = new RestWrapper();
+
+            var serializer = new JsonSerializer();
+            var stringContent = new StringWriter();
+            serializer.Serialize(stringContent, withdrawInfoResponse);
+            var result = await rest.Put(Service.GetWithdrawInfo, stringContent.ToString(), AuthTokenType.SignIn);
+
+            return result.IsSuccessStatusCode;
+        }
 
     }
 }
