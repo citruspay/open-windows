@@ -30,4 +30,19 @@ namespace Citrus.SDK.Entity
         [JsonProperty("paymentMode")]
         public NetBanking NetBanking { get; set; }
     }
+
+    public class TokenBankingPayment : IPaymentMode
+    {
+        [JsonProperty("id")]
+        public string TokenId { get; set; }
+
+        [JsonProperty("type")]
+        internal string Type
+        {
+            get
+            {
+                return PaymentType.Token.GetEnumDescription();
+            }
+        }
+    }
 }

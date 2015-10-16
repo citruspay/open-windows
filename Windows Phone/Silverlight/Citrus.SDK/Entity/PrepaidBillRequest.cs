@@ -16,7 +16,7 @@ namespace Citrus.SDK.Entity
         public string CurrencyType { get; set; }
 
         [JsonProperty("amount")]
-        public int Amount { get; set; }
+        public double Amount { get; set; }
 
         [JsonProperty("redirect")]
         public string RedirectUrl { get; set; }

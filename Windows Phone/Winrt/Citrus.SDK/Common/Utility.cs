@@ -59,6 +59,7 @@ namespace Citrus.SDK.Common
         public const string SignInTokenKey = "SignInToken";
         public const string SimpleTokenKey = "SimpleToken";
         public const string ConfigKey = "CitrusMerchantConfig";
+        public const string PrepaidSignInTokenKey = "PrepaidSignInToken";
 
         #endregion
 

@@ -42,6 +42,9 @@ namespace Citrus.SDK
         /// </summary>
         internal static OAuthToken signInToken;
 
+
+        internal static OAuthToken simpleToken;
+
         /// <summary>
         /// Session User
         /// </summary>
@@ -63,7 +66,7 @@ namespace Citrus.SDK
         /// Auth token
         /// </returns>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-        public static async Task<string> GetAuthTokenAsync(AuthTokenType authTokenType)
+        internal static async Task<string> GetAuthTokenAsync(AuthTokenType authTokenType)
         {
             switch (authTokenType)
             {
@@ -71,6 +74,10 @@ namespace Citrus.SDK
                     return signInToken != null ? await signInToken.GetActiveTokenAsync() : string.Empty;
                 case AuthTokenType.SignUp:
                     return signUpToken != null ? await signUpToken.GetActiveTokenAsync() : string.Empty;
+                case AuthTokenType.Simple:
+                    return simpleToken != null ? await simpleToken.GetActiveTokenAsync() : string.Empty;
+                case AuthTokenType.PrepaidSignIn:
+                    return signInToken != null ? await signInToken.GetActiveTokenAsync() : string.Empty;
                 default:
                     return string.Empty;
             }
@@ -90,6 +97,18 @@ namespace Citrus.SDK
                 if (signUpToken != null)
                     await signUpToken.GetActiveTokenAsync();
             }
+            else if (authTokenType == AuthTokenType.Simple && simpleToken == null)
+            {
+                simpleToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.SimpleTokenKey);
+                if (simpleToken != null)
+                    await simpleToken.GetActiveTokenAsync();
+            }
+            else if (authTokenType == AuthTokenType.PrepaidSignIn && signInToken == null)
+            {
+                signInToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.PrepaidSignInTokenKey);
+                if (signInToken != null)
+                    await signInToken.GetActiveTokenAsync();
+            }
         }
 
         /// <summary>
@@ -100,15 +119,15 @@ namespace Citrus.SDK
         /// </returns>
         public static async Task<User> GetBalance()
         {
-            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+            await GetTokenIfEmptyAsync(AuthTokenType.Simple);
 
-            if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
+            if (simpleToken == null || string.IsNullOrEmpty(simpleToken.AccessToken))
             {
                 throw new UnauthorizedAccessException("User is not logged to perform Get Balance");
             }
 
             var rest = new RestWrapper();
-            var result = await rest.Get<User>(Service.GetBalance, AuthTokenType.SignIn);
+            var result = await rest.Get<User>(Service.GetBalance, AuthTokenType.Simple);
 
             if (!(result is Error))
             {
@@ -182,7 +201,9 @@ namespace Citrus.SDK
             if (!(result is Error))
             {
                 signInToken = result as OAuthToken;
+                simpleToken = result as OAuthToken;
                 Utility.SaveToLocalStorage(Utility.SignInTokenKey, signInToken);
+                Utility.SaveToLocalStorage(Utility.SimpleTokenKey, simpleToken);
                 return signInToken != null && !string.IsNullOrEmpty(signInToken.AccessToken);
             }
 
@@ -303,6 +324,81 @@ namespace Citrus.SDK
             return false;
         }
 
+        public static async Task<User> BindUser(string email, string mobile)
+        {
+            if (string.IsNullOrEmpty(Config.SignUpId) || string.IsNullOrEmpty(Config.SignUpSecret))
+            {
+                throw new ServiceException("Invalid Configuration: Client ID & Client Secret");
+            }
+
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException("Invalid parameter", "email");
+            }
+
+            if (string.IsNullOrEmpty(mobile))
+            {
+                throw new ArgumentException("Invalid parameter", "mobile");
+            }
+
+            await GetSignupToken();
+            var objectToPost = new User { Email = email, Mobile = mobile };
+            user = objectToPost;
+            var rest = new RestWrapper();
+            var result = await rest.Post<User>(Service.BindUser, AuthTokenType.SignUp, objectToPost);
+            if (!(result is Error))
+            {
+                user.UserName = ((User)result).UserName;
+                if (!string.IsNullOrEmpty(user.UserName))
+                {
+                    var signInRequest = new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>("client_id", Config.SignInId),
+                        new KeyValuePair<string, string>("client_secret", Config.SignInSecret),
+                        new KeyValuePair<string, string>("grant_type", "username"),
+                        new KeyValuePair<string, string>("username", user.Email)
+                    };
+
+                    var authTokenResult = await rest.Post<OAuthToken>(Service.Signin, signInRequest, AuthTokenType.None);
+
+                    if (!(authTokenResult is Error))
+                    {
+                        signInToken = null;
+                        Utility.RemoveEntry(Utility.SignInTokenKey);
+                        simpleToken = authTokenResult as OAuthToken;
+                        return user;
+                    }
+
+                    Utility.ParseAndThrowError((authTokenResult as Error).Response);
+                    return null;
+                }
+            }
+            else
+            {
+                Utility.ParseAndThrowError((result as Error).Response);
+            }
+
+            return null;
+        }
+
+        public static async Task<bool> IsCitrusMemeber(string email, string mobile)
+        {
+            var newUser = await BindUser(email, mobile);
+            var randomPasswordGenerator = new RandomPasswordGenerator();
+            newUser.Password = randomPasswordGenerator.Generate(newUser.Email, newUser.Mobile);
+
+            var request = new SigninRequest { User = new User { UserName = newUser.UserName, Password = newUser.Password } };
+
+            var rest = new RestWrapper();
+            var result = await rest.Post<OAuthToken>(Service.Signin, AuthTokenType.None, request);
+            if (!(result is Error))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region Methods
@@ -312,7 +408,7 @@ namespace Citrus.SDK
         /// </summary>
         /// <returns>
         /// </returns>
-        private static async Task GetSignupToken()
+        public static async Task GetSignupToken()
         {
             await GetTokenIfEmptyAsync(AuthTokenType.SignUp);
 
@@ -338,9 +434,210 @@ namespace Citrus.SDK
         {
             signInToken = new OAuthToken();
             signUpToken = new OAuthToken();
+            simpleToken = new OAuthToken();
             user = new User();
             Utility.RemoveAllEntries();
         }
+
+        #endregion
+
+        #region User Management
+
+        public static async Task<bool> UpdateMobile(string newMobile)
+        {
+            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Update Password");
+            }
+
+            var request = new List<KeyValuePair<string, string>>
+                              {
+                                  new KeyValuePair<string, string>("mobile", newMobile), 
+                              };
+            var rest = new RestWrapper();
+            var result = await rest.Put(Service.UpdateMobile, request, AuthTokenType.SignIn);
+
+            if (result is bool && (bool)result)
+            {
+                return true;
+            }
+            else
+            {
+                var error = result as Error;
+                if (error != null)
+                {
+                    Utility.ParseAndThrowError(error.Response);
+                }
+            }
+
+            return false;
+        }
+
+        public static async Task<bool> GenerateOTPUsingMobile(string Mobile)
+        {
+            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            //if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
+            //{
+            //    throw new UnauthorizedAccessException("User is not logged to perform the action: Generate OTP");
+            //}
+
+            var request = new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>("source", "RIO"), 
+                        new KeyValuePair<string, string>("otpType", "Mobile"), 
+                        new KeyValuePair<string, string>("identity", Mobile)
+                    };
+            var objOTP = new OTP()
+            {
+                Source = "RIO",
+                OTPType = "Mobile",
+                Identity = Mobile,
+            };
+
+            var rest = new RestWrapper();
+            var result = await rest.Post<ResponseEntity>(Service.GenerateOTP, AuthTokenType.None, objOTP, true);
+
+            if (!(result is Error))
+            {
+                return true;
+            }
+            else
+            {
+                var error = result as Error;
+                if (error != null)
+                {
+                    Utility.ParseAndThrowError(error.Response);
+                }
+            }
+
+            return false;
+        }
+
+        public static async Task<bool> GenerateOTPUsingEmailId(string EmailId)
+        {
+            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            //if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
+            //{
+            //    throw new UnauthorizedAccessException("User is not logged to perform the action: Generate OTP");
+            //}
+
+            var request = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("source", "RIO"), 
+                    new KeyValuePair<string, string>("otpType", "Email"), 
+                    new KeyValuePair<string, string>("identity", EmailId)
+                };
+            var rest = new RestWrapper();
+            var result = await rest.Post<OAuthToken>(Service.GenerateOTP, request, AuthTokenType.None);
+
+            if (!(result is Error))
+            {
+                return true;
+            }
+            else
+            {
+                var error = result as Error;
+                if (error != null)
+                {
+                    Utility.ParseAndThrowError(error.Response);
+                }
+            }
+            return false;
+        }
+
+        public static async Task<bool> SignInUsingOTP(string EmailId, string OTP)
+        {
+            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            if (Session.Config == null || string.IsNullOrEmpty(Session.Config.SignInId) || string.IsNullOrEmpty(Session.Config.SignInSecret))
+            {
+                throw new ServiceException("Invalid Configuration: Client ID & Client Secret");
+            }
+
+            //Renew token
+            var rest = new RestWrapper();
+            var result = await rest.Post<OAuthToken>(
+                    Service.Signin,
+                    new List<KeyValuePair<string, string>>()
+                            {
+                                new KeyValuePair<string, string>("client_id", Session.Config.SignInId),
+                                new KeyValuePair<string, string>("client_secret", Session.Config.SignInSecret),
+                                new KeyValuePair<string, string>("grant_type", "onetimepass"),
+                                new KeyValuePair<string, string>("username", EmailId),
+                                new KeyValuePair<string, string>("password", OTP)
+                            },
+                    AuthTokenType.None);
+
+            if (!(result is Error))
+            {
+                signInToken = result as OAuthToken;
+                simpleToken = result as OAuthToken;
+                Utility.SaveToLocalStorage(Utility.SignInTokenKey, signInToken);
+                Utility.SaveToLocalStorage(Utility.SimpleTokenKey, simpleToken);
+                return signInToken != null && !string.IsNullOrEmpty(signInToken.AccessToken);
+            }
+
+            Utility.ParseAndThrowError((result as Error).Response);
+            return false;
+        }
+
+        public static async Task<UserProfile> GetProfileInfo()
+        {
+            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Get Profile Info");
+            }
+
+            var restWrapper = new RestWrapper();
+            var response = await restWrapper.Get<UserProfile>(Service.GetProfileInfo, AuthTokenType.SignIn);
+            if (!(response is Error))
+            {
+                var user = response as UserProfile;
+                return user;
+            }
+
+            return null;
+        }
+
+        public static async Task<bool> UpdateProfile(UserProfile userProfile)
+        {
+            await GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+
+            if (signInToken == null || string.IsNullOrEmpty(signInToken.AccessToken))
+            {
+                throw new UnauthorizedAccessException("User is not logged to perform the action: Update Password");
+            }
+
+            //var request = new List<KeyValuePair<string, string>>
+            //    {
+            //        new KeyValuePair<string, string>("firstname", userProfile.FirstName), 
+            //        new KeyValuePair<string, string>("lastname", userProfile.LastName),
+            //    };
+            UserProfileRequest userprofilepostData = new UserProfileRequest()
+            {
+                Email = "",
+                Mobile = "",
+                FirstName = userProfile.FirstName,
+                LastName = userProfile.LastName,
+            };
+
+            var rest = new RestWrapper();
+            var response = await rest.Put<UserProfile>(Service.UpdateProfile, AuthTokenType.SignIn, userprofilepostData, true);
+            if (!(response is Error))
+            {
+                var user = response as ResponseEntity;
+                return true;
+            }
+
+            return false;
+        }
+
 
         #endregion
     }

@@ -76,6 +76,8 @@ namespace Citrus.SDK
                     return signUpToken != null ? await signUpToken.GetActiveTokenAsync() : string.Empty;
                 case AuthTokenType.Simple:
                     return simpleToken != null ? await simpleToken.GetActiveTokenAsync() : string.Empty;
+                case AuthTokenType.PrepaidSignIn:
+                    return signInToken != null ? await signInToken.GetActiveTokenAsync() : string.Empty;
                 default:
                     return string.Empty;
             }
@@ -100,6 +102,12 @@ namespace Citrus.SDK
                 simpleToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.SimpleTokenKey);
                 if (simpleToken != null)
                     await simpleToken.GetActiveTokenAsync();
+            }
+            else if (authTokenType == AuthTokenType.PrepaidSignIn && signInToken == null)
+            {
+                signInToken = Utility.ReadFromLocalStorage<OAuthToken>(Utility.PrepaidSignInTokenKey);
+                if (signInToken != null)
+                    await signInToken.GetActiveTokenAsync();
             }
         }
 

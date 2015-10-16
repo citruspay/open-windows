@@ -387,10 +387,10 @@ namespace Citrus.SDK.Common
         /// <exception cref="ArgumentException">
         /// </exception>
         public int TransformBlock(
-            byte[] inputBuffer, 
-            int inputOffset, 
-            int inputCount, 
-            byte[] outputBuffer, 
+            byte[] inputBuffer,
+            int inputOffset,
+            int inputCount,
+            byte[] outputBuffer,
             int outputOffset)
         {
             if (inputBuffer == null)

@@ -109,6 +109,7 @@
     <Compile Include="Entity\PaymentRequest.cs" />
     <Compile Include="Entity\PrepaidBill.cs" />
     <Compile Include="Entity\PrepaidBillRequest.cs" />
+    <Compile Include="Entity\Prepaid_Pay_Token.cs" />
     <Compile Include="Entity\SigninRequest.cs" />
     <Compile Include="Entity\SignupTokenRequest.cs" />
     <Compile Include="Entity\Token.cs" />

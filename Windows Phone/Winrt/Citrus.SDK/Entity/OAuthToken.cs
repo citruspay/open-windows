@@ -83,6 +83,15 @@ namespace Citrus.SDK.Entity
 
         internal DateTime ExpirationTime { get; set; }
 
+        [JsonProperty("Prepaid_Pay_Token")]
+        public Prepaid_Pay_Token prepaid_Pay_Token { get; set; }
+
+        /// <summary>
+        /// Access Token
+        /// </summary>
+        [JsonProperty("Prepaid_access_token")]
+        public string PrepaidAccessToken { get; set; }
+
         #endregion
 
         #region Public Methods and Operators
@@ -130,6 +139,10 @@ namespace Citrus.SDK.Entity
                         this.ExpiresIn = oauthToken.ExpiresIn;
                         this.Scope = oauthToken.Scope;
                         this.TokenType = oauthToken.TokenType;
+                        if (oauthToken.prepaid_Pay_Token != null)
+                            this.PrepaidAccessToken = oauthToken.prepaid_Pay_Token.AccessToken;
+                        else
+                            this.PrepaidAccessToken = oauthToken.AccessToken;
                     }
                 }
             }

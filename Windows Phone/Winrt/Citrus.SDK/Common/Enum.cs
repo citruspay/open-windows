@@ -55,7 +55,12 @@ namespace Citrus.SDK.Common
         /// </summary>
         SignUp,
 
-        Simple
+        Simple,
+
+        /// <summary>
+        ///     Prepaid Sign In Token Type
+        /// </summary>
+        PrepaidSignIn,
     }
 
     public enum CardType

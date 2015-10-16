@@ -18,8 +18,8 @@
 namespace Citrus.SDK.Common
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Reflection;
 
     /// <summary>
@@ -38,22 +38,35 @@ namespace Citrus.SDK.Common
         /// <returns>
         /// Description string
         /// </returns>
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly",
             Justification = "Reviewed. Suppression is OK here.")]
         public static string GetEnumDescription(this Enum value)
         {
-            FieldInfo fi = value.GetType().GetField(value.ToString());
-
-            var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
-
-            if (attributes.Length > 0)
+            Type type = value.GetType();
+            FieldInfo fi = type.GetRuntimeField(value.ToString());
+            var stringValueAttribute = fi.GetCustomAttributes(typeof(ValueAttribute), false).FirstOrDefault() as ValueAttribute;
+            if (stringValueAttribute != null)
             {
-                return attributes[0].Description;
+                return stringValueAttribute.Value;
             }
 
-            return value.ToString();
+            return string.Empty;
         }
 
         #endregion
+    }
+
+    public class ValueAttribute : Attribute
+    {
+        private string _value;
+        public ValueAttribute(string value)
+        {
+            this._value = value;
+        }
+
+        public string Value
+        {
+            get { return this._value; }
+        }
     }
 }

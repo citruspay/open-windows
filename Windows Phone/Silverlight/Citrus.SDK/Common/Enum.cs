@@ -17,8 +17,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace Citrus.SDK.Common
 {
-    using System.ComponentModel;
-
     /// <summary>
     ///     Target Citrus Pay Service Type
     /// </summary>
@@ -27,13 +25,13 @@ namespace Citrus.SDK.Common
         /// <summary>
         ///     The sandbox environment for development and testing
         /// </summary>
-        [Description("https://sandboxadmin.citruspay.com/")]
-        Sandbox, 
+        [Value("https://sandboxadmin.citruspay.com/")]
+        Sandbox,
 
         /// <summary>
         ///     The Production Environment for Real time or Live Services
         /// </summary>
-        [Description("https://admin.citruspay.com/")]
+        [Value("https://admin.citruspay.com/")]
         Production
     }
 
@@ -55,44 +53,59 @@ namespace Citrus.SDK.Common
         /// <summary>
         ///     Sign Up Token Type
         /// </summary>
-        SignUp
+        SignUp,
+
+        Simple,
+
+        /// <summary>
+        ///     Prepaid Sign In Token Type
+        /// </summary>
+        PrepaidSignIn,
     }
 
     public enum CardType
     {
-        [Description("debit")]
+        [Value("")]
+        UnKnown,
+        [Value("debit")]
         Debit,
-        [Description("credit")]
-        Credit
+        [Value("credit")]
+        Credit,
+        [Value("prepaid")]
+        Prepaid
     }
 
     public enum PaymentType
     {
-        [Description("paymentOptionToken")]
+        [Value("paymentOptionToken")]
         Card,
-        [Description("paymentOptionIdToken")]
+        [Value("paymentOptionIdToken")]
         Token,
-        [Description("netbanking")]
-        NetBanking
+        [Value("netbanking")]
+        NetBanking,
+        [Value("prepaid")]
+        Prepaid
     }
 
-    public enum CreditCardType 
+    public enum CreditCardType
     {
-        [Description("VISA")]
+        [Value("VISA")]
         Visa,
-        [Description("DISCOVER")]
+        [Value("DISCOVER")]
         Discover,
-        [Description("AMEX")]
+        [Value("AMEX")]
         Amex,
-        [Description("MTRO")]
+        [Value("MTRO")]
         Mtro,
-        [Description("MCRD")]
+        [Value("MCRD")]
         Mcrd,
-        [Description("DINERS")]
+        [Value("DINERS")]
         Diners,
-        [Description("JCB")]
+        [Value("JCB")]
         Jcb,
-        [Description("UNKNOWN")]
-        Unknown
+        [Value("UNKNOWN")]
+        Unknown,
+        [Value("CPAY")]
+        Prepaid
     }
 }

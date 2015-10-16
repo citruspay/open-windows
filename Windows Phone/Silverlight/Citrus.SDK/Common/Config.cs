@@ -18,8 +18,6 @@
 
 namespace Citrus.SDK.Common
 {
-    using System.Windows.Controls.Primitives;
-
     /// <summary>
     ///     Config related to accessing Citrus REST end points
     /// </summary>
@@ -35,6 +33,8 @@ namespace Citrus.SDK.Common
 
         private string signUpSecret;
 
+        private string vanity;
+
         #region Public Properties
 
         /// <summary>
@@ -44,11 +44,11 @@ namespace Citrus.SDK.Common
         {
             get
             {
-                return environment;
+                return this.environment;
             }
             private set
             {
-                environment = value;
+                this.environment = value;
             }
         }
 
@@ -59,11 +59,11 @@ namespace Citrus.SDK.Common
         {
             get
             {
-                return signInId;
+                return this.signInId;
             }
             private set
             {
-                signInId = value;
+                this.signInId = value;
             }
         }
 
@@ -74,11 +74,11 @@ namespace Citrus.SDK.Common
         {
             get
             {
-                return signInSecret;
+                return this.signInSecret;
             }
             private set
             {
-                signInSecret = value;
+                this.signInSecret = value;
             }
         }
 
@@ -89,11 +89,11 @@ namespace Citrus.SDK.Common
         {
             get
             {
-                return signUpId;
+                return this.signUpId;
             }
             private set
             {
-                signUpId = value;
+                this.signUpId = value;
             }
         }
 
@@ -104,24 +104,40 @@ namespace Citrus.SDK.Common
         {
             get
             {
-                return signUpSecret;
+                return this.signUpSecret;
             }
             private set
             {
-                signUpSecret = value;
+                this.signUpSecret = value;
             }
         }
 
-        public static void Initialize(EnvironmentType environmentType, string signUpClientId, string signUpClientSecret, string signInClientId, string signInClientSecret)
+        /// <summary>
+        ///     Gets or sets the Client Secret for Sign Up
+        /// </summary>
+        public string Vanity
+        {
+            get
+            {
+                return this.vanity;
+            }
+            private set
+            {
+                this.vanity = value;
+            }
+        }
+
+        public static void Initialize(EnvironmentType environmentType, string signUpClientId, string signUpClientSecret, string signInClientId, string signInClientSecret, string vanity)
         {
             var config = new Config()
-                                 {
-                                     Environment = environmentType,
-                                     SignUpId = signUpClientId,
-                                     SignUpSecret = signUpClientSecret,
-                                     SignInId = signInClientId,
-                                     SignInSecret = signInClientSecret
-                                 };
+            {
+                Environment = environmentType,
+                SignUpId = signUpClientId,
+                SignUpSecret = signUpClientSecret,
+                SignInId = signInClientId,
+                SignInSecret = signInClientSecret,
+                Vanity = vanity
+            };
 
             var localConfig = Utility.ReadFromLocalStorage<Config>(Utility.ConfigKey);
 

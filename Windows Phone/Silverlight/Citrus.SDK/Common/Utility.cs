@@ -23,11 +23,11 @@ namespace Citrus.SDK.Common
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.IO.IsolatedStorage;
     using System.Linq;
-    using System.Text.RegularExpressions;
 
     using Citrus.SDK.Entity;
+
+    using Windows.Storage;
 
     using Newtonsoft.Json;
 
@@ -57,7 +57,9 @@ namespace Citrus.SDK.Common
 
         public const string SignUpTokenKey = "SignUpToken";
         public const string SignInTokenKey = "SignInToken";
-        public const string ConfigKey = "CitrusMerchatConfig";
+        public const string SimpleTokenKey = "SimpleToken";
+        public const string ConfigKey = "CitrusMerchantConfig";
+        public const string PrepaidSignInTokenKey = "PrepaidSignInToken";
 
         #endregion
 
@@ -102,30 +104,28 @@ namespace Citrus.SDK.Common
 
         public static void SaveToLocalStorage<T>(string key, T value) where T : class
         {
-            IsolatedStorageSettings storageSettings = IsolatedStorageSettings.ApplicationSettings;
+            var storageSettings = ApplicationData.Current.LocalSettings;
             var serializer = new JsonSerializer();
             var jsonObject = new StringWriter();
             serializer.Serialize(jsonObject, value);
-            if (storageSettings.Contains(key))
+            if (storageSettings.Values.ContainsKey(key))
             {
-                storageSettings[key] = jsonObject;
+                storageSettings.Values[key] = jsonObject.ToString();
             }
             else
             {
-                storageSettings.Add(key, jsonObject);
+                storageSettings.Values.Add(key, jsonObject.ToString());
             }
-
-            storageSettings.Save();
         }
 
         public static T ReadFromLocalStorage<T>(string key) where T : class
         {
-            IsolatedStorageSettings storageSettings = IsolatedStorageSettings.ApplicationSettings;
+            var storageSettings = ApplicationData.Current.LocalSettings;
 
-            if (storageSettings.Contains(key))
+            if (storageSettings.Values.ContainsKey(key))
             {
                 var serializer = new JsonSerializer();
-                return serializer.Deserialize<T>(new JsonTextReader(new StringReader(storageSettings[key].ToString())));
+                return serializer.Deserialize<T>(new JsonTextReader(new StringReader(storageSettings.Values[key].ToString())));
             }
 
             return null;
@@ -133,34 +133,37 @@ namespace Citrus.SDK.Common
 
         public static void RemoveEntry(string key)
         {
-            IsolatedStorageSettings storageSettings = IsolatedStorageSettings.ApplicationSettings;
+            var storageSettings = ApplicationData.Current.LocalSettings;
 
-            if (storageSettings.Contains(key))
+            if (storageSettings.Values.ContainsKey(key))
             {
-                storageSettings.Remove(key);
-                storageSettings.Save();
+                storageSettings.Values.Remove(key);
             }
         }
 
         public static void RemoveAllEntries()
         {
-            IsolatedStorageSettings storageSettings = IsolatedStorageSettings.ApplicationSettings;
-            if (storageSettings.Contains(SignInTokenKey))
+            var storageSettings = ApplicationData.Current.LocalSettings;
+
+            if (storageSettings.Values.ContainsKey(SignInTokenKey))
             {
-                storageSettings.Remove(SignInTokenKey);
+                storageSettings.Values.Remove(SignInTokenKey);
             }
 
-            if (storageSettings.Contains(SignUpTokenKey))
+            if (storageSettings.Values.ContainsKey(SignUpTokenKey))
             {
-                storageSettings.Remove(SignUpTokenKey);
+                storageSettings.Values.Remove(SignUpTokenKey);
             }
 
-            if (storageSettings.Contains(ConfigKey))
+            if (storageSettings.Values.ContainsKey(SimpleTokenKey))
             {
-                storageSettings.Remove(ConfigKey);
+                storageSettings.Values.Remove(SimpleTokenKey);
             }
 
-            storageSettings.Save();
+            if (storageSettings.Values.ContainsKey(ConfigKey))
+            {
+                storageSettings.Values.Remove(ConfigKey);
+            }
         }
 
         public static bool PassesLuhnTest(string cardNumber)

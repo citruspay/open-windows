@@ -12,7 +12,7 @@ namespace Citrus.SDK.Entity
 
     using Newtonsoft.Json;
 
-    public class Card 
+    public class Card
     {
         public Card()
         {
@@ -38,7 +38,10 @@ namespace Citrus.SDK.Entity
             set
             {
                 this._cardNumber = value;
-                this.CardScheme = Utility.GetCardTypeFromNumber(value);
+                if (this.CardType == CardType.Prepaid)
+                    this.CardScheme = CreditCardType.Prepaid;
+                else
+                    this.CardScheme = Utility.GetCardTypeFromNumber(value);
             }
         }
 
@@ -63,8 +66,22 @@ namespace Citrus.SDK.Entity
             }
         }
 
+        private CardType _CardType;
+
         [JsonIgnore]
-        public CardType CardType { get; set; }
+        public CardType CardType
+        {
+            get
+            {
+                return _CardType;
+            }
+            set
+            {
+                _CardType = value;
+                if (this.CardType == CardType.Prepaid)
+                    this.CardScheme = CreditCardType.Prepaid;
+            }
+        }
 
         [JsonProperty("expiry")]
         public string CardExpiryDate
@@ -77,6 +94,62 @@ namespace Citrus.SDK.Entity
 
         [JsonIgnore]
         public CardExpiry ExpiryDate { get; set; }
+
+        public bool IsValid()
+        {
+            if (this.CardScheme.HasValue && this.CardScheme.Value == CreditCardType.Mtro)
+            {
+                return validateNumber() && this.CardType == CardType.Debit;
+            }
+            else if (string.IsNullOrEmpty(this.CVV))
+            {
+                return validateNumber() && this.ExpiryDate.IsValid();
+            }
+            else
+            {
+                return validateNumber() && this.ExpiryDate.IsValid() && validateCVV();
+            }
+        }
+
+        private bool validateNumber()
+        {
+            if (!this.CardScheme.HasValue || string.IsNullOrEmpty(_cardNumber))
+                return false;
+
+            if (CardScheme.Value == CreditCardType.Mtro)
+            {
+                return Utility.PassesLuhnTest(this._cardNumber);
+            }
+
+            String rawNumber = this._cardNumber.Trim().Replace("-", "");
+
+            if (string.IsNullOrEmpty(rawNumber) || !Utility.PassesLuhnTest(this._cardNumber))
+            {
+                return false;
+            }
+
+            if (this.CardScheme == CreditCardType.Amex && (rawNumber.Length != 16 || rawNumber.Length != 15))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool validateCVV()
+        {
+            if (string.IsNullOrEmpty(this.CVV))
+            {
+                return false;
+            }
+            String cvcValue = CVV.Trim();
+
+            bool validLength = ((this.CardScheme == null && cvcValue.Length >= 3 && cvcValue.Length <= 4)
+                    || (CardScheme == CreditCardType.Amex && cvcValue.Length == 4) || (CardScheme != CreditCardType.Amex && cvcValue
+                    .Length == 3));
+
+            return validLength;
+        }
     }
 
     public class CardPayment : PaymentDetailsBase, IPaymentMode

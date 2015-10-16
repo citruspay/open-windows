@@ -69,6 +69,32 @@ namespace Citrus.SDK.Common
         /// </summary>
         private const string ServiceVersion = "service/v2/";
 
+        public const string BindUser = ServiceVersion + "identity/bind";
+
+        public const string Wallet = ServiceVersion + "profile/me/payment";
+
+        public const string GetMerchantPaymentOptions = "service/v1/merchant/pgsetting";
+
+        public const string WithdrawMoney = ServiceVersion + "prepayment/cashout";
+
+        public const string GetCookies = "prepaid/pg/_verify";
+
+        public const string UpdateMobile = ServiceVersion + "identity/me/mobile";
+
+        public const string GenerateOTP = "service/um/otp/generate";
+
+        public const string SignInUsingOTP = "oauth/token";
+
+        public const string GetProfileInfo = "service/um/profile/profileInfo";
+
+        public const string UpdateProfile = "service/um/profile/update";
+
+        public const string TransferMoneyUsingEmail = ServiceVersion + "prepayment/transfer";
+
+        public const string TransferMoneyUsingMobile = ServiceVersion + "prepayment/transfer/extended";
+
+        public const string GetWithdrawInfo = ServiceVersion + "profile/me/prepaid";
+
         #endregion
     }
 }

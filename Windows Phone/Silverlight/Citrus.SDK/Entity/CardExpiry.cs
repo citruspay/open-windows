@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Citrus.SDK.Entity
+﻿namespace Citrus.SDK.Entity
 {
+    using System;
+
     public class CardExpiry
     {
         private int _month;
@@ -46,6 +42,16 @@ namespace Citrus.SDK.Entity
 
                 this._year = value;
             }
+        }
+
+        public bool IsValid()
+        {
+            if (DateTime.Now.Year < this.Year)
+                return true;
+            else if (DateTime.Now.Year == this.Year && DateTime.Now.Month <= this.Month)
+                return true;
+            else
+                return false;
         }
     }
 }
