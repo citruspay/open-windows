@@ -770,7 +770,7 @@ namespace Citrus.SampleApp
                 request.BillAmount = this.amount;
                 
                 //request.RedirectUrl = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
-                request.RedirectUrl = "http://localhost:51142/ReturnURL.aspx";
+                request.RedirectUrl = "http://localhost:51142/TestWebPage.aspx";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new CardPayment()
                 {
@@ -869,11 +869,11 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string BankCode = "CID002";
+                string BankCode = "CID019";
                 var request = new LoadMoneyRequest();
                 this.amount.Value = orderAmount;
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://localhost:51142/ReturnURL.aspx";
+                request.RedirectUrl = "http://localhost:51142/TestWebPage.aspx";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new NetBankingPayment()
                 {
