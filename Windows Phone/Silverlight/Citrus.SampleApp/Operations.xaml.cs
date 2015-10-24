@@ -23,6 +23,7 @@ namespace Citrus.SampleApp
         {
             this.InitializeComponent();
             Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "test-signin", "52f7e15efd4208cf5345dd554443fd99", "testing");
+   
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -333,8 +334,8 @@ namespace Citrus.SampleApp
         {
             try
             {
-                string emailid = "user@email.com";
-                string password = "password";
+                string emailid = "maheshmutyal1@mailinator.com";
+                string password = "test@123";
 
                 loginStatus.Text = string.Empty;
                 LoadingBar.Visibility = Visibility.Visible;
@@ -767,7 +768,9 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
+                
+                //request.RedirectUrl = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
+                request.RedirectUrl = "http://localhost:51142/ReturnURL.aspx";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new CardPayment()
                 {
@@ -790,6 +793,7 @@ namespace Citrus.SampleApp
                 var result = await Wallet.LoadMoneyAsync(request);
                 if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
+                    loadwebbrowser.Source = new Uri(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status);
                 }
                 else
@@ -1226,5 +1230,16 @@ namespace Citrus.SampleApp
         }
 
         #endregion
+
+        #region Web Browser Callback
+
+        private void loadwebbrowser_ScriptNotify(object sender, NotifyEventArgs e)
+        {
+            var valueFromBrowser = e.Value;
+            MessageBox.Show(valueFromBrowser);
+        }
+
+        #endregion
+
     }
 }

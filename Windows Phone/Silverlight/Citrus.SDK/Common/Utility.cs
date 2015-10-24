@@ -30,6 +30,7 @@ namespace Citrus.SDK.Common
     using Windows.Storage;
 
     using Newtonsoft.Json;
+    using System.IO.IsolatedStorage;
 
     /// <summary>
     ///     Utility methods
@@ -104,28 +105,37 @@ namespace Citrus.SDK.Common
 
         public static void SaveToLocalStorage<T>(string key, T value) where T : class
         {
-            var storageSettings = ApplicationData.Current.LocalSettings;
+            IsolatedStorageSettings storageSettings = IsolatedStorageSettings.ApplicationSettings;
             var serializer = new JsonSerializer();
             var jsonObject = new StringWriter();
             serializer.Serialize(jsonObject, value);
-            if (storageSettings.Values.ContainsKey(key))
+            if (storageSettings.Contains(key))
             {
-                storageSettings.Values[key] = jsonObject.ToString();
+                storageSettings[key] = jsonObject;
             }
             else
             {
-                storageSettings.Values.Add(key, jsonObject.ToString());
+                storageSettings.Add(key, jsonObject);
             }
+
+            storageSettings.Save();
         }
 
         public static T ReadFromLocalStorage<T>(string key) where T : class
         {
-            var storageSettings = ApplicationData.Current.LocalSettings;
-
-            if (storageSettings.Values.ContainsKey(key))
+            try
             {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<T>(new JsonTextReader(new StringReader(storageSettings.Values[key].ToString())));
+                IsolatedStorageSettings storageSettings = IsolatedStorageSettings.ApplicationSettings;
+
+                if (storageSettings.Contains(key))
+                {
+                    var serializer = new JsonSerializer();
+                    return serializer.Deserialize<T>(new JsonTextReader(new StringReader(storageSettings[key].ToString())));
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
 
             return null;
@@ -133,37 +143,34 @@ namespace Citrus.SDK.Common
 
         public static void RemoveEntry(string key)
         {
-            var storageSettings = ApplicationData.Current.LocalSettings;
+            IsolatedStorageSettings storageSettings = IsolatedStorageSettings.ApplicationSettings;
 
-            if (storageSettings.Values.ContainsKey(key))
+            if (storageSettings.Contains(key))
             {
-                storageSettings.Values.Remove(key);
+                storageSettings.Remove(key);
+                storageSettings.Save();
             }
         }
 
         public static void RemoveAllEntries()
         {
-            var storageSettings = ApplicationData.Current.LocalSettings;
-
-            if (storageSettings.Values.ContainsKey(SignInTokenKey))
+            IsolatedStorageSettings storageSettings = IsolatedStorageSettings.ApplicationSettings;
+            if (storageSettings.Contains(SignInTokenKey))
             {
-                storageSettings.Values.Remove(SignInTokenKey);
+                storageSettings.Remove(SignInTokenKey);
             }
 
-            if (storageSettings.Values.ContainsKey(SignUpTokenKey))
+            if (storageSettings.Contains(SignUpTokenKey))
             {
-                storageSettings.Values.Remove(SignUpTokenKey);
+                storageSettings.Remove(SignUpTokenKey);
             }
 
-            if (storageSettings.Values.ContainsKey(SimpleTokenKey))
+            if (storageSettings.Contains(ConfigKey))
             {
-                storageSettings.Values.Remove(SimpleTokenKey);
+                storageSettings.Remove(ConfigKey);
             }
 
-            if (storageSettings.Values.ContainsKey(ConfigKey))
-            {
-                storageSettings.Values.Remove(ConfigKey);
-            }
+            storageSettings.Save();
         }
 
         public static bool PassesLuhnTest(string cardNumber)
