@@ -873,7 +873,7 @@ namespace Citrus.SampleApp
                 var request = new LoadMoneyRequest();
                 this.amount.Value = orderAmount;
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
+                request.RedirectUrl = "http://localhost:51142/ReturnURL.aspx";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new NetBankingPayment()
                 {
@@ -885,8 +885,10 @@ namespace Citrus.SampleApp
                 };
 
                 var result = await Wallet.LoadMoneyAsync(request);
-                if (result != null)
+
+                if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
+                    loadwebbrowser.Source = new Uri(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status);
                 }
                 else

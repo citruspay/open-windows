@@ -91,7 +91,6 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Button Margin="5" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Card" Click="Card1_OnClick"></Button>
                     <phone:WebBrowser Name="loadwebbrowser" HorizontalAlignment="Left" IsScriptEnabled="True" Margin="-1,0,0,-77" Grid.Row="1" VerticalAlignment="Top" Width="450" Height="500" ScriptNotify="loadwebbrowser_ScriptNotify"/>
 
                 </Grid>
