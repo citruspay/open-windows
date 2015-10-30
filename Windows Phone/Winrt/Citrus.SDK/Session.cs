@@ -490,7 +490,8 @@ namespace Citrus.SDK
                         new KeyValuePair<string, string>("otpType", "Mobile"), 
                         new KeyValuePair<string, string>("identity", Mobile)
                     };
-            var objOTP = new OTP() {
+            var objOTP = new OTP()
+            {
                 Source = "RIO",
                 OTPType = "Mobile",
                 Identity = Mobile,
@@ -625,7 +626,7 @@ namespace Citrus.SDK
                 FirstName = userProfile.FirstName,
                 LastName = userProfile.LastName,
             };
-            
+
             var rest = new RestWrapper();
             var response = await rest.Put<UserProfile>(Service.UpdateProfile, AuthTokenType.SignIn, userprofilepostData, true);
             if (!(response is Error))

@@ -256,6 +256,19 @@ namespace Citrus.SampleApp
             }
         }
 
+        private async Task<PaymentBill> GetBillAsync(int orderAmount)
+        {
+            //return await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
+            //{
+            //    Value = orderAmount
+            //});
+
+            return await PaymentGateway.GetBillAsync("http://localhost:9001/billGenerator.aspx", new Amount()
+            {
+                Value = orderAmount
+            });
+        }
+
         #endregion
 
         #region User Managment
@@ -770,7 +783,7 @@ namespace Citrus.SampleApp
                 request.BillAmount = this.amount;
                 
                 //request.RedirectUrl = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
-                request.RedirectUrl = "http://localhost:51142/TestWebPage.aspx";
+                request.RedirectUrl = "http://192.168.1.147:9001/WindowsReturnURL.aspx";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new CardPayment()
                 {
@@ -980,14 +993,6 @@ namespace Citrus.SampleApp
             }
         }
 
-        private async Task<PaymentBill> GetBillAsync(double orderAmount)
-        {
-            return await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
-            {
-                Value = 1
-            });
-        }
-
         private async void CitrusCashPayment_OnClick(object sender, RoutedEventArgs e)
         {
             try
@@ -1081,7 +1086,7 @@ namespace Citrus.SampleApp
             {
                 LoadingBar.Visibility = Visibility.Visible;
                 string to = "user@email.com";
-                double amount = 1;
+                int amount = 1;
                 string message = "my msg";
 
                 var result = await Wallet.TransferMoneyUsingEmail(new TransferMoneyRequest()
@@ -1125,7 +1130,7 @@ namespace Citrus.SampleApp
             {
                 LoadingBar.Visibility = Visibility.Visible;
                 string to = "user@email.com";
-                double amount = 1;
+                int amount = 1;
                 string message = "my msg";
 
                 var result = await Wallet.TransferMoneyUsingMobile(new TransferMoneyRequest()

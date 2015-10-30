@@ -1,12 +1,13 @@
 ﻿namespace Citrus.SDK.Entity
 {
     using Newtonsoft.Json;
+    using System;
 
     public class Amount
     {
-        private int value;
+        private Int32 value;
         [JsonProperty("value")]
-        public int Value
+        public Int32 Value
         {
             get
             {

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace Citrus.SDK.Entity
 {
@@ -8,7 +9,7 @@ namespace Citrus.SDK.Entity
         public string To { get; set; }
 
         [JsonProperty("amount")]
-        public double Amount { get; set; }
+        public Int32 Amount { get; set; }
 
         [JsonProperty("currency")]
         public string Currency { get; set; }

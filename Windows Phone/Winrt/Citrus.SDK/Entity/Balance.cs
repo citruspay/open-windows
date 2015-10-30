@@ -9,9 +9,9 @@ namespace Citrus.SDK.Entity
 {
     public class Balance
     {
-        private double value;
+        private Int32 value;
         [JsonProperty("value")]
-        public double Value
+        public Int32 Value
         {
             get
             {

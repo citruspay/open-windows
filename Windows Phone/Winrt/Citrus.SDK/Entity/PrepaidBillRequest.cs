@@ -4,6 +4,7 @@
     using System.Globalization;
 
     using Newtonsoft.Json;
+    using System;
 
     public class PrepaidBillRequest : IEntity
     {
@@ -11,7 +12,7 @@
         public string CurrencyType { get; set; }
 
         [JsonProperty("amount")]
-        public double Amount { get; set; }
+        public Int32 Amount { get; set; }
 
         [JsonProperty("redirect")]
         public string RedirectUrl { get; set; }

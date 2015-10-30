@@ -39,6 +39,8 @@ namespace Citrus.SampleApp
             //Config.Initialize(EnvironmentType.Sandbox, "o9s2w3ml3q-signup", "c8476d512e306f19265d532dae60b966", "o9s2w3ml3q-signin", "e74f57011fb12ff49c9b2e9ca4133f3a", "testedURL");
             Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "test-signin", "52f7e15efd4208cf5345dd554443fd99", "testing");
             this.NavigationCacheMode = NavigationCacheMode.Required;
+
+            //paymentwebview.NavigationCompleted += paymentwebview_NavigationCompleted;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -281,6 +283,12 @@ namespace Citrus.SampleApp
             {
                 LoadingBar.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void paymentwebview_ScriptNotify(object sender, NotifyEventArgs e)
+        {
+            var strResponse = e.Value;
+            new MessageDialog(strResponse).ShowAsync();
         }
 
         #endregion
@@ -810,7 +818,7 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
+                request.RedirectUrl = "http://192.168.1.147:9001/WindowsReturnURL.aspx";
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new CardPayment()
                 {
@@ -1020,11 +1028,16 @@ namespace Citrus.SampleApp
             }
         }
 
-        private async Task<PaymentBill> GetBillAsync(double orderAmount)
+        private async Task<PaymentBill> GetBillAsync(Int32 orderAmount)
         {
-            return await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
+            //return await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
+            //{
+            //    Value = orderAmount
+            //});
+
+            return await PaymentGateway.GetBillAsync("http://192.168.1.147:9001/billGenerator.aspx", new Amount()
             {
-                Value = 1
+                Value = orderAmount
             });
         }
 
@@ -1116,17 +1129,21 @@ namespace Citrus.SampleApp
         {
             try
             {
-                //Uri targetUri = new Uri(result.RedirectUrl);
-                //citruswebview.Navigate(targetUri);
+                Uri targetUri = new Uri(RedirectUrl);
+                paymentwebview.Navigate(targetUri);
 
-                Uri baseUri = new Uri(RedirectUrl);
-                Windows.Web.Http.Filters.HttpBaseProtocolFilter filter = new Windows.Web.Http.Filters.HttpBaseProtocolFilter();
-                Windows.Web.Http.HttpCookie cookie = new Windows.Web.Http.HttpCookie("cookieName", baseUri.Host, "/");
-                cookie.Value = "cookieValue";
-                filter.CookieManager.SetCookie(cookie, false);
+                //Uri baseUri = new Uri(RedirectUrl);
+                //Windows.Web.Http.Filters.HttpBaseProtocolFilter filter = new Windows.Web.Http.Filters.HttpBaseProtocolFilter();
+                //Windows.Web.Http.HttpCookie cookie = new Windows.Web.Http.HttpCookie("cookieName", baseUri.Host, "/");
+                //cookie.Value = "cookieValue";
+                //filter.CookieManager.SetCookie(cookie, false);
 
-                Windows.Web.Http.HttpRequestMessage httpRequestMessage = new Windows.Web.Http.HttpRequestMessage(Windows.Web.Http.HttpMethod.Get, baseUri);
-                paymentwebview.NavigateWithHttpRequestMessage(httpRequestMessage);
+                //Windows.Web.Http.HttpRequestMessage httpRequestMessage = new Windows.Web.Http.HttpRequestMessage(Windows.Web.Http.HttpMethod.Get, baseUri);
+                //paymentwebview.NavigateWithHttpRequestMessage(httpRequestMessage);
+
+                //List<Uri> allowedUris = new List<Uri>();
+                //allowedUris.Add(new Uri(RedirectUrl));
+                //paymentwebview.AllowedScriptNotifyUris = allowedUris;
 
             }
             catch (Exception exception)
@@ -1167,7 +1184,7 @@ namespace Citrus.SampleApp
             {
                 LoadingBar.Visibility = Visibility.Visible;
                 string to = txtTranToEmail.Text.Trim();
-                double amount = Convert.ToDouble(txtTranAmount.Text.Trim());
+                Int32 amount = Convert.ToInt32(txtTranAmount.Text.Trim());
                 string message = txtTranMessage.Text.Trim();
 
                 var result = await Wallet.TransferMoneyUsingEmail(new TransferMoneyRequest()
@@ -1317,7 +1334,23 @@ namespace Citrus.SampleApp
             }
         }
 
+        private void citruswebview_ScriptNotify(object sender, NotifyEventArgs e)
+        {
+            var strResponse = e.Value;
+            new MessageDialog(strResponse).ShowAsync();
+        }
+
         #endregion
+
+
+//        async void paymentwebview_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
+//        {
+//            string inject =
+//                @"window.alert = function(arg) {
+//            window.external.notify(arg);
+//        };";
+//            await paymentwebview.InvokeScriptAsync("eval", new List<string>() { inject });
+//        }
 
     }
 }

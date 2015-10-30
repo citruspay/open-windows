@@ -350,7 +350,7 @@
             </PivotItem>
             <PivotItem Header="Web View">
                 <Grid>
-                 <WebView Name="citruswebview" />   
+                 <WebView Name="citruswebview" ScriptNotify="citruswebview_ScriptNotify" />   
                 </Grid>
             </PivotItem>
 
@@ -435,7 +435,7 @@
 
             <PivotItem Header="Web View">
                 <Grid>
-                    <WebView Name="paymentwebview" />
+                    <WebView Name="paymentwebview" ScriptNotify="paymentwebview_ScriptNotify" />
                 </Grid>
             </PivotItem>
 

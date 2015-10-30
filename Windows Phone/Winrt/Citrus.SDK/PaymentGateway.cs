@@ -61,7 +61,7 @@ namespace Citrus.SDK
 
         public async Task<Transaction> ProcessPaymentAsync()
         {
-            await Session.GetTokenIfEmptyAsync(AuthTokenType.SignIn);
+            //await Session.GetTokenIfEmptyAsync(AuthTokenType.SignIn);
 
             //if (Session.signInToken == null || string.IsNullOrEmpty(Session.signInToken.AccessToken))
             //{
@@ -155,7 +155,8 @@ namespace Citrus.SDK
             };
 
             var rest = new RestWrapper();
-            var result = await rest.Post<Transaction>(Service.LoadMoney, AuthTokenType.SignIn, paymentRequest, true);
+            //var result = await rest.Post<Transaction>(Service.LoadMoney, AuthTokenType.SignIn, paymentRequest, true);
+            var result = await rest.Post<Transaction>(Service.LoadMoney, AuthTokenType.None, paymentRequest, true);
 
             if (!(result is Error))
             {
@@ -208,6 +209,6 @@ namespace Citrus.SDK
 
             return true;
         }
-        
+
     }
 }

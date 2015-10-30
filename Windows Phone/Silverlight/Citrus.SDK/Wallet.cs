@@ -154,7 +154,7 @@ namespace Citrus.SDK
 
         #endregion
 
-        private static async Task<PrepaidBill> GetPrepaidBillAsync(double amount, string currencyType, string redirectUrl)
+        private static async Task<PrepaidBill> GetPrepaidBillAsync(int amount, string currencyType, string redirectUrl)
         {
             var restWrapper = new RestWrapper();
             var result =
