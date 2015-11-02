@@ -19,11 +19,17 @@ namespace Citrus.SampleApp
     {
         #region Init
 
+        string ReturnURL = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
+        string BillURL = "https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php";
+        
+        //string ReturnURL = "http://localhost:9001/WindowsReturnURL.aspx";
+        //string BillURL = "http://localhost:9001/billGenerator.aspx";
+
         public Operations()
         {
             this.InitializeComponent();
             Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "test-signin", "52f7e15efd4208cf5345dd554443fd99", "testing");
-   
+
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -102,8 +108,9 @@ namespace Citrus.SampleApp
 
                 var pg = new PaymentGateway(bill, payment, UserDetails);
                 var result = await pg.ProcessPaymentAsync();
-                if (result != null)
+                if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
+                    PaymentWebView(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status + ", Redirect URL:" + result.RedirectUrl);
                 }
                 else
@@ -144,8 +151,9 @@ namespace Citrus.SampleApp
 
                 var pg = new PaymentGateway(bill, payment, UserDetails);
                 var result = await pg.ProcessPaymentAsync();
-                if (result != null)
+                if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
+                    PaymentWebView(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status + ", Redirect URL:" + result.RedirectUrl);
                 }
                 else
@@ -189,8 +197,9 @@ namespace Citrus.SampleApp
 
                 var pg = new PaymentGateway(bill, payment, UserDetails);
                 var result = await pg.ProcessPaymentAsync();
-                if (result != null)
+                if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
+                    PaymentWebView(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status + ", Redirect URL:" + result.RedirectUrl);
                 }
                 else
@@ -229,8 +238,9 @@ namespace Citrus.SampleApp
 
                 var pg = new PaymentGateway(bill, payment, UserDetails);
                 var result = await pg.ProcessPaymentAsync();
-                if (result != null)
+                if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
+                    PaymentWebView(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status + ", Redirect URL:" + result.RedirectUrl);
                 }
                 else
@@ -263,7 +273,7 @@ namespace Citrus.SampleApp
             //    Value = orderAmount
             //});
 
-            return await PaymentGateway.GetBillAsync("http://localhost:9001/billGenerator.aspx", new Amount()
+            return await PaymentGateway.GetBillAsync(BillURL, new Amount()
             {
                 Value = orderAmount
             });
@@ -781,9 +791,9 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
                 request.BillAmount = this.amount;
-                
+
                 //request.RedirectUrl = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
-                request.RedirectUrl = "http://192.168.1.147:9001/WindowsReturnURL.aspx";
+                request.RedirectUrl = ReturnURL;
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new CardPayment()
                 {
@@ -806,7 +816,7 @@ namespace Citrus.SampleApp
                 var result = await Wallet.LoadMoneyAsync(request);
                 if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
-                    loadwebbrowser.Source = new Uri(result.RedirectUrl);
+                    LoadWebView(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status);
                 }
                 else
@@ -840,7 +850,7 @@ namespace Citrus.SampleApp
                 var request = new LoadMoneyRequest();
                 this.amount.Value = orderAmount;
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
+                request.RedirectUrl = ReturnURL;
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new TokenPayment()
                 {
@@ -850,8 +860,9 @@ namespace Citrus.SampleApp
                 };
 
                 var result = await Wallet.LoadMoneyAsync(request);
-                if (result != null)
+                if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
+                    LoadWebView(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status);
                 }
                 else
@@ -886,7 +897,7 @@ namespace Citrus.SampleApp
                 var request = new LoadMoneyRequest();
                 this.amount.Value = orderAmount;
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://localhost:51142/TestWebPage.aspx";
+                request.RedirectUrl = ReturnURL;
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new NetBankingPayment()
                 {
@@ -901,7 +912,7 @@ namespace Citrus.SampleApp
 
                 if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
                 {
-                    loadwebbrowser.Source = new Uri(result.RedirectUrl);
+                    LoadWebView(result.RedirectUrl);
                     MessageBox.Show("Result Code:" + result.Code + ", Status: " + result.Status);
                 }
                 else
@@ -1240,13 +1251,30 @@ namespace Citrus.SampleApp
 
         #region Web Browser Callback
 
+        private void PaymentWebView(string RedirectUrl)
+        {
+            paymentwebbrowser.Source = new Uri(RedirectUrl);
+        }
+
+        private void LoadWebView(string RedirectUrl)
+        {
+            loadwebbrowser.Source = new Uri(RedirectUrl);
+        }
+
         private void loadwebbrowser_ScriptNotify(object sender, NotifyEventArgs e)
         {
             var valueFromBrowser = e.Value;
             MessageBox.Show(valueFromBrowser);
         }
 
+        private void paymentwebbrowser_ScriptNotify(object sender, NotifyEventArgs e)
+        {
+            var valueFromBrowser = e.Value;
+            MessageBox.Show(valueFromBrowser);
+        }
+
         #endregion
+
 
     }
 }

@@ -32,6 +32,10 @@ namespace Citrus.SampleApp
     {
         #region Init
 
+        //string ReturnURL = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
+        string ReturnURL = "http://192.168.1.193:9001/WindowsReturnURL.aspx";
+        string BillURL = "http://192.168.1.193:9001/billGenerator.aspx";
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -289,6 +293,35 @@ namespace Citrus.SampleApp
         {
             var strResponse = e.Value;
             new MessageDialog(strResponse).ShowAsync();
+        }
+
+        private void OpenPaymentWebView(string RedirectUrl, string strcookie)
+        {
+            try
+            {
+                paymentwebview.AllowedScriptNotifyUris.Add(new Uri(RedirectUrl));
+                paymentwebview.AllowedScriptNotifyUris.Add(new Uri(ReturnURL));
+                Uri targetUri = new Uri(RedirectUrl);
+                paymentwebview.Navigate(targetUri);
+
+                //Uri baseUri = new Uri(RedirectUrl);
+                //Windows.Web.Http.Filters.HttpBaseProtocolFilter filter = new Windows.Web.Http.Filters.HttpBaseProtocolFilter();
+                //Windows.Web.Http.HttpCookie cookie = new Windows.Web.Http.HttpCookie("cookieName", baseUri.Host, "/");
+                //cookie.Value = "cookieValue";
+                //filter.CookieManager.SetCookie(cookie, false);
+
+                //Windows.Web.Http.HttpRequestMessage httpRequestMessage = new Windows.Web.Http.HttpRequestMessage(Windows.Web.Http.HttpMethod.Get, baseUri);
+                //paymentwebview.NavigateWithHttpRequestMessage(httpRequestMessage);
+
+                //List<Uri> allowedUris = new List<Uri>();
+                //allowedUris.Add(new Uri(RedirectUrl));
+                //paymentwebview.AllowedScriptNotifyUris = allowedUris;
+
+            }
+            catch (Exception exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
         }
 
         #endregion
@@ -818,7 +851,7 @@ namespace Citrus.SampleApp
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://192.168.1.147:9001/WindowsReturnURL.aspx";
+                request.RedirectUrl = ReturnURL;
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new CardPayment()
                 {
@@ -875,7 +908,7 @@ namespace Citrus.SampleApp
                 var request = new LoadMoneyRequest();
                 this.amount.Value = orderAmount;
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
+                request.RedirectUrl = ReturnURL;
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new TokenPayment()
                 {
@@ -921,7 +954,7 @@ namespace Citrus.SampleApp
                 var request = new LoadMoneyRequest();
                 this.amount.Value = orderAmount;
                 request.BillAmount = this.amount;
-                request.RedirectUrl = "http://yourwebsite.com/return_url.php";
+                request.RedirectUrl = ReturnURL;
                 request.UserDetails = this.UserDetails;
                 request.PaymentDetails = new NetBankingPayment()
                 {
@@ -1030,12 +1063,12 @@ namespace Citrus.SampleApp
 
         private async Task<PaymentBill> GetBillAsync(Int32 orderAmount)
         {
-            //return await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
+            //return await PaymentGateway.GetBillAsync(BillURL, new Amount()
             //{
             //    Value = orderAmount
             //});
 
-            return await PaymentGateway.GetBillAsync("http://192.168.1.147:9001/billGenerator.aspx", new Amount()
+            return await PaymentGateway.GetBillAsync(BillURL, new Amount()
             {
                 Value = orderAmount
             });
@@ -1118,33 +1151,6 @@ namespace Citrus.SampleApp
 
                 Windows.Web.Http.HttpRequestMessage httpRequestMessage = new Windows.Web.Http.HttpRequestMessage(Windows.Web.Http.HttpMethod.Get, baseUri);
                 citruswebview.NavigateWithHttpRequestMessage(httpRequestMessage);
-            }
-            catch (Exception exception)
-            {
-                new MessageDialog(exception.Message).ShowAsync();
-            }
-        }
-
-        private void OpenPaymentWebView(string RedirectUrl, string strcookie)
-        {
-            try
-            {
-                Uri targetUri = new Uri(RedirectUrl);
-                paymentwebview.Navigate(targetUri);
-
-                //Uri baseUri = new Uri(RedirectUrl);
-                //Windows.Web.Http.Filters.HttpBaseProtocolFilter filter = new Windows.Web.Http.Filters.HttpBaseProtocolFilter();
-                //Windows.Web.Http.HttpCookie cookie = new Windows.Web.Http.HttpCookie("cookieName", baseUri.Host, "/");
-                //cookie.Value = "cookieValue";
-                //filter.CookieManager.SetCookie(cookie, false);
-
-                //Windows.Web.Http.HttpRequestMessage httpRequestMessage = new Windows.Web.Http.HttpRequestMessage(Windows.Web.Http.HttpMethod.Get, baseUri);
-                //paymentwebview.NavigateWithHttpRequestMessage(httpRequestMessage);
-
-                //List<Uri> allowedUris = new List<Uri>();
-                //allowedUris.Add(new Uri(RedirectUrl));
-                //paymentwebview.AllowedScriptNotifyUris = allowedUris;
-
             }
             catch (Exception exception)
             {
@@ -1343,14 +1349,14 @@ namespace Citrus.SampleApp
         #endregion
 
 
-//        async void paymentwebview_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
-//        {
-//            string inject =
-//                @"window.alert = function(arg) {
-//            window.external.notify(arg);
-//        };";
-//            await paymentwebview.InvokeScriptAsync("eval", new List<string>() { inject });
-//        }
+        //        async void paymentwebview_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
+        //        {
+        //            string inject =
+        //                @"window.alert = function(arg) {
+        //            window.external.notify(arg);
+        //        };";
+        //            await paymentwebview.InvokeScriptAsync("eval", new List<string>() { inject });
+        //        }
 
     }
 }

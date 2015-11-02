@@ -284,18 +284,20 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <TextBox Name="txtsigninemailid" Grid.Row="0" Width="320" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" VerticalAlignment="Top" PlaceholderText="Email Id"/>
                     <TextBox Name="txtsigninpassword" Grid.Row="1" Width="300" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="test@123" VerticalAlignment="Top" PlaceholderText="Password"/>
 
-                    <Button Margin="10" Grid.Row="2" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign In" Click="SignIn_OnClick"></Button>
-                    <Button Margin="10" Grid.Row="3" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Bind User" Click="Bind_OnClick"></Button>
-                    <Button Margin="10" Grid.Row="4" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign out" Click="SignOut_OnClick"></Button>
-
-                    <StackPanel Grid.Row="5" Name="SignInResultPanel">
+                    <Button Margin="5" Grid.Row="2" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign In" Click="SignIn_OnClick"></Button>
+                    <Button Margin="5" Grid.Row="3" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Bind User" Click="Bind_OnClick"></Button>
+                    <Button Margin="5" Grid.Row="4" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign out" Click="SignOut_OnClick"></Button>
+                    <Button Margin="5" Grid.Row="5" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Reset" Click="Reset_OnClick"></Button>
+                    
+                    <StackPanel Grid.Row="6" Name="SignInResultPanel">
                         <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Result:"></TextBlock>
-                        <StackPanel Margin="10">
+                        <StackPanel Margin="5">
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Text="Status: "></TextBlock>
                                 <TextBlock Text="" Name="loginStatus"></TextBlock>
@@ -313,7 +315,7 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Card" Click="Card_OnClick"></Button>
+                    <TextBox Name="txtLoadAmount" Margin="5" Grid.Row="0" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="1" PlaceholderText="Amount"/>
                     <Button Margin="15" Grid.Row="1" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Token" Click="Token_OnClick"></Button>
                     <TextBox Name="txtLoadBankCode" Margin="5" Grid.Row="2" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="CID002" PlaceholderText="Bank Code"/>
                     <Button Margin="15" Grid.Row="2" Height="100" Width="200" HorizontalAlignment="Right" VerticalAlignment="Top" Content="Net Banking" Click="NetBanking_OnClick"></Button>
@@ -333,7 +335,7 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="User Info: "></TextBlock>
+                    <TextBlock Grid.Row="0" Text="Debit/Credit Card Info: "></TextBlock>
                     <TextBox Name="txtcardemailid" Grid.Row="1" Width="320" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" VerticalAlignment="Top" PlaceholderText="Email Id"/>
                     <TextBox Name="txtcardmobile" Grid.Row="2" Width="320" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="9011094323" VerticalAlignment="Top" PlaceholderText="Mobile No"/>
 
@@ -351,13 +353,6 @@
             <PivotItem Header="Web View">
                 <Grid>
                  <WebView Name="citruswebview" ScriptNotify="citruswebview_ScriptNotify" />   
-                </Grid>
-            </PivotItem>
-
-            <PivotItem Header="Reset Password">
-                <Grid>
-                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Reset" Click="Reset_OnClick"></Button>
-
                 </Grid>
             </PivotItem>
 
@@ -390,7 +385,7 @@
                 </Grid>
             </PivotItem>
 
-            <PivotItem Header="Payment">
+            <PivotItem Header="PG Payment">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>

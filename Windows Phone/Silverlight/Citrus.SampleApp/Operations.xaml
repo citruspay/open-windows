@@ -23,25 +23,33 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign Up" Click="SignUp_OnClick"></Button>
-                    <StackPanel Grid.Row="1" Name="ResultPanel">
+                    <TextBox Name="txtemailid" Margin="2" Grid.Row="0" Width="400" HorizontalAlignment="Left" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" VerticalAlignment="Top" />
+                    <TextBox Name="txtmobile" Margin="2" Grid.Row="1" Width="400" HorizontalAlignment="Left" TextWrapping="Wrap" Text="9011094322" VerticalAlignment="Top" />
+                    <TextBox Name="txtpassword" Margin="2" Grid.Row="2" Width="400" HorizontalAlignment="Left" TextWrapping="Wrap" Text="test@123" VerticalAlignment="Top" />
+                    <Button Grid.Row="3" Margin="3" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Is Cirtus Member" Click="IsCitrusMember_OnClick"></Button>
+                    <Button Grid.Row="4" Margin="3" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign Up" Click="SignUp_OnClick"></Button>
+                    <StackPanel Grid.Row="5" Name="ResultPanel">
                         <TextBlock Style="{StaticResource PhoneTextLargeStyle}" Text="Result:"></TextBlock>
-                        <StackPanel Margin="10">
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                        <StackPanel Margin="5">
+                            <StackPanel Orientation="Horizontal" Margin="5">
                                 <TextBlock Text="Username: "></TextBlock>
                                 <TextBlock Text="{Binding Username}"></TextBlock>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="5">
                                 <TextBlock Text="Mobile: "></TextBlock>
                                 <TextBlock Text="{Binding Mobile}"></TextBlock>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="10">
+                            <StackPanel Orientation="Horizontal" Margin="5">
                                 <TextBlock Text="Balance Amount: "></TextBlock>
                                 <TextBlock Text="{Binding BalanceAmount}"></TextBlock>
                             </StackPanel>
-                            <StackPanel Margin="10" Orientation="Horizontal">
+                            <StackPanel Margin="5" Orientation="Horizontal">
                                 <TextBlock Text="Currency: "></TextBlock>
                                 <TextBlock Text="{Binding CurrencyFormat}"></TextBlock>
                             </StackPanel>
@@ -57,14 +65,23 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign In" Click="SignIn_OnClick"></Button>
-                    <Button Margin="15" Grid.Row="1" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign out" Click="SignOut_OnClick"></Button>
+                    <TextBox Name="txtsigninemailid" Grid.Row="0" Width="400" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" VerticalAlignment="Top" />
+                    <TextBox Name="txtsigninpassword" Grid.Row="1" Width="400" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="test@123" VerticalAlignment="Top" />
 
-                    <StackPanel Grid.Row="2" Name="SignInResultPanel">
+                    <Button Margin="5" Grid.Row="2" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign In" Click="SignIn_OnClick"></Button>
+                    <Button Margin="5" Grid.Row="3" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Bind User" Click="Bind_OnClick"></Button>
+                    <Button Margin="5" Grid.Row="4" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Sign out" Click="SignOut_OnClick"></Button>
+                    <Button Margin="5" Grid.Row="5" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Reset" Click="Reset_OnClick"></Button>
+
+                    <StackPanel Grid.Row="6" Name="SignInResultPanel">
                         <TextBlock Style="{StaticResource PhoneTextLargeStyle}" Text="Result:"></TextBlock>
-                        <StackPanel Margin="10">
+                        <StackPanel Margin="5">
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <TextBlock Text="Status: "></TextBlock>
                                 <TextBlock Text="" Name="loginStatus"></TextBlock>
@@ -78,29 +95,186 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Card" Click="Card_OnClick"></Button>
+                    <TextBox Name="txtLoadAmount" Margin="5" Grid.Row="0" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="1"/>
                     <Button Margin="15" Grid.Row="1" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Token" Click="Token_OnClick"></Button>
-                    <Button Margin="15" Grid.Row="2" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Net Banking" Click="NetBanking_OnClick"></Button>
+                    <TextBox Name="txtLoadBankCode" Margin="5" Grid.Row="2" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="CID002"/>
+                    
+                    <Button Margin="15" Grid.Row="2" Height="100" Width="200" HorizontalAlignment="Right" VerticalAlignment="Top" Content="Net Banking" Click="NetBanking_OnClick"></Button>
+                    <Button Margin="15" Grid.Row="3" Height="80" Width="300" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Pay using Citrus Cash" Click="CitrusCashPayment_OnClick"></Button>
                 </Grid>
             </phone:PivotItem>
             <phone:PivotItem Header="Load Money">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <phone:WebBrowser Name="loadwebbrowser" HorizontalAlignment="Left" IsScriptEnabled="True" Margin="-1,0,0,-77" Grid.Row="1" VerticalAlignment="Top" Width="450" Height="500" ScriptNotify="loadwebbrowser_ScriptNotify"/>
+                    <TextBlock Grid.Row="0" Text="Debit/Credit Card Info: "></TextBlock>
+                    <TextBox Name="txtcardemailid" Grid.Row="1" Width="400" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" VerticalAlignment="Top" />
+                    <TextBox Name="txtcardmobile" Grid.Row="2" Width="400" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="9011094323" VerticalAlignment="Top"/>
+                    <TextBox Name="txtcardAccountHolderName" Grid.Row="3" Width="400" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="John Smith" VerticalAlignment="Top"/>
+                    <TextBox Name="txtcardCardNumber" Grid.Row="4" Width="400" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="4111111111111111" VerticalAlignment="Top"/>
+                    <TextBox Name="txtcardExpiryMM" Grid.Row="5" Width="200" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="01" VerticalAlignment="Top" />
+                    <TextBox Name="txtcardExpiryYYYY" Grid.Row="5" Width="200" HorizontalAlignment="Right" Margin="5" TextWrapping="Wrap" Text="2030" VerticalAlignment="Top" />
+                    <TextBox Name="txtcardCardType" Grid.Row="6" Width="180" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="Credit" VerticalAlignment="Top" />
+                    <TextBox Name="txtcardCVV" Grid.Row="6" Width="120" HorizontalAlignment="Center" Margin="5" TextWrapping="Wrap" Text="123" VerticalAlignment="Top" />
+                    <TextBox Name="txtcardAmount" Grid.Row="6" Width="150" HorizontalAlignment="Right" Margin="5" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" />
 
+                    <Button Grid.Row="7" Margin="5" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Card" Click="Card_OnClick"></Button>
                 </Grid>
             </phone:PivotItem>
-            <phone:PivotItem Header="Reset Password">
+            <phone:PivotItem Header="Load Money View">
                 <Grid>
-                    <Button Margin="15" Height="100" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Reset" Click="Reset_OnClick"></Button>
-
+                    <phone:WebBrowser Name="loadwebbrowser" HorizontalAlignment="Left" IsScriptEnabled="True" Margin="-1,0,0,-77" Grid.Row="1" VerticalAlignment="Top" Width="450" Height="500" ScriptNotify="loadwebbrowser_ScriptNotify"/>
                 </Grid>
             </phone:PivotItem>
+            <phone:PivotItem Header="Wallet">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Button Content="Save Payment Options" Click="SavePayment_OnClick"></Button>
+                    <Button Content="Get Merchant Payment Options" Grid.Row="1"  Click="GetMerchantPaymentOptions_OnClick"></Button>
+                    <Button Content="Get User Payment Options" Grid.Row="2" Click="GetWallet_OnClick"></Button>
+                   
+                    <Button Content="Delete Selected Payment Option" Grid.Row="3" Click="DeletePaymentOption_OnClick"></Button>
+                    <Button Content="Withdraw Money Option" Grid.Row="4" Click="WithdrawMoneyOption_OnClick"></Button>
+                    <Button Content="Get Loan Money Payment Options" Grid.Row="5"  Click="GetLoadMoneyPaymentOptions_OnClick"></Button>
+                </Grid>
+            </phone:PivotItem>
+
+            <phone:PivotItem Header="PG Payment">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Button Margin="15" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Card" Click="CardPayment_OnClick"></Button>
+                    <Button Margin="15" Grid.Row="1" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Token" Click="TokenPayment_OnClick"></Button>
+                    <TextBox Name="txtPaymentBankCode" Margin="5" Grid.Row="2" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="CID002" />
+                    <Button Margin="15" Grid.Row="2" Height="80" Width="200" HorizontalAlignment="Right" VerticalAlignment="Top" Content="Net Banking" Click="NetBankingPayment_OnClick"></Button>
+                    <Button Margin="15" Grid.Row="3" Height="80" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Net Banking token" Click="NetBankingTokenPayment_OnClick"></Button>
+                </Grid>
+            </phone:PivotItem>
+
+            <phone:PivotItem Header="Card Payment">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Debit/Credit Card Info: "></TextBlock>
+                    <TextBox Name="txtcpaymentemailid" Grid.Row="1" Width="400" HorizontalAlignment="Left" Margin="3" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" VerticalAlignment="Top" />
+                    <TextBox Name="txtcpaymentmobile" Grid.Row="2" Width="400" HorizontalAlignment="Left" Margin="3" TextWrapping="Wrap" Text="9011094323" VerticalAlignment="Top" />
+                    <TextBox Name="txtcpaymentAccountHolderName" Grid.Row="3" Width="400" HorizontalAlignment="Left" Margin="3" TextWrapping="Wrap" Text="John Smith" VerticalAlignment="Top" />
+                    <TextBox Name="txtcpaymentCardNumber" Grid.Row="4" Width="400" HorizontalAlignment="Left" Margin="3" TextWrapping="Wrap" Text="4111111111111111" VerticalAlignment="Top" />
+                    <TextBox Name="txtcpaymentExpiryMM" Grid.Row="5" Width="150" HorizontalAlignment="Left" Margin="3" TextWrapping="Wrap" Text="01" VerticalAlignment="Top" />
+                    <TextBox Name="txtcpaymentExpiryYYYY" Grid.Row="5" Width="150" HorizontalAlignment="Right" Margin="3" TextWrapping="Wrap" Text="2030" VerticalAlignment="Top" />
+                    <TextBox Name="txtcpaymentCardType" Grid.Row="6" Width="150" HorizontalAlignment="Left" Margin="3" TextWrapping="Wrap" Text="Credit" VerticalAlignment="Top" />
+                    <TextBox Name="txtcpaymentCVV" Grid.Row="6" Width="120" HorizontalAlignment="Center" Margin="3" TextWrapping="Wrap" Text="123" VerticalAlignment="Top" />
+                    <TextBox Name="txtcpaymentAmount" Grid.Row="6" Width="150" HorizontalAlignment="Right" Margin="3" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" />
+
+                    <Button Grid.Row="7" Margin="5" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Card" Click="CardPayment_OnClick"></Button>
+                </Grid>
+            </phone:PivotItem>
+
+            <phone:PivotItem Header="PG Payment View">
+                <Grid>
+                    <phone:WebBrowser Name="paymentwebbrowser" HorizontalAlignment="Left" IsScriptEnabled="True" Margin="-1,0,0,-77" Grid.Row="1" VerticalAlignment="Top" Width="450" Height="500" ScriptNotify="paymentwebbrowser_ScriptNotify" />
+                </Grid>
+            </phone:PivotItem>
+
+            <phone:PivotItem Header="User Managment">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBox Name="txtUMmobile" Margin="5" Grid.Row="0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="9011094322" />
+                    <Button Margin="5" Height="70" Width="220" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" Content="Update Mobile" Click="UpdateMobile_OnClick"></Button>
+                    <TextBox Name="txtUMEmailId" Margin="5" Grid.Row="1" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" />
+                    <Button Margin="5" Grid.Row="2" Height="70" Width="220" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Generate OTP" Click="GenerateOTP_OnClick"></Button>
+                    <TextBox Name="txtUMOTP" Margin="5" Grid.Row="3" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="1234" />
+                    <Button Margin="5" Grid.Row="3" Height="70" Width="250" HorizontalAlignment="Right" VerticalAlignment="Center" Content="Signin using OTP" Click="SigninUsingOTP_OnClick"></Button>
+                    <Button Margin="15" Grid.Row="4" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Get Profile Info" Click="GetProfileInfo_OnClick"></Button>
+                    <TextBox Name="txtUMFirstName" Margin="5" Grid.Row="5" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="Wrap" Text="John" />
+                    <TextBox Name="txtUMLastName" Margin="5" Grid.Row="5" Width="200" HorizontalAlignment="Right" VerticalAlignment="Top" TextWrapping="Wrap" Text="Smith"/>
+                    <Button Margin="5" Grid.Row="6" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Update Profile" Click="UpdateProfile_OnClick"></Button>
+                </Grid>
+            </phone:PivotItem>
+
+            <phone:PivotItem Header="Transfer Money">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBox Name="txtTranToEmail" Margin="5" Grid.Row="0" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="maheshmutyal1@mailinator.com" />
+                    <TextBox Name="txtTranToMobile" Margin="5" Grid.Row="1" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="9011094323" />
+                    <TextBox Name="txtTranAmount" Margin="5" Grid.Row="2" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="1" />
+                    <TextBox Name="txtTranMessage" Margin="5" Grid.Row="3" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="Test Message.." />
+
+                    <Button Margin="5" Height="70" Width="300" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Transfer Money using Email" Click="TranMoneyEmail_OnClick"></Button>
+                    <Button Margin="5" Height="70" Width="300" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Transfer Money using Mobile" Click="TranMoneyMobile_OnClick"></Button>
+                </Grid>
+            </phone:PivotItem>
+
+            <phone:PivotItem Header="Withdraw Money">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBox Name="txtWithdrawOwner" Margin="5" Grid.Row="0" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="mahesh mutyal" />
+                    <TextBox Name="txtWithdrawBranch" Margin="5" Grid.Row="1" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="HSBC0000123" />
+                    <TextBox Name="txtWithdrawNumber" Margin="5" Grid.Row="2" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="123456789987654" />
+                    <TextBox Name="txtWithdrawType" Margin="5" Grid.Row="3" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="prepaid" />
+
+                    <Button Margin="5" Height="70" Width="300" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Save Withdraw Money" Click="SaveWithdrawMoney_OnClick"></Button>
+                    <Button Margin="5" Height="70" Width="350" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Get Withdraw Money Info" Click="GetWithdrawInfo_OnClick"></Button>
+                </Grid>
+            </phone:PivotItem>
+
         </phone:Pivot>
     </Grid>
 
