@@ -76,17 +76,26 @@ namespace Citrus.SampleApp
             {
                 LoadingBar.Visibility = Visibility.Visible;
 
-                string AccountHolderName = "Pearson Charles";
-                string CVV = "123";
-                Int32 ExpiryMonth = 1;
-                Int32 ExpiryYear = 2020;
-                string CardNumber = "4242424242424242";
-                CardType objCardType = CardType.Debit;
+                string AccountHolderName = txtcpaymentAccountHolderName.Text;
+                string CVV = txtcpaymentCVV.Text;
+                Int32 ExpiryMonth = Convert.ToInt32(txtcpaymentExpiryMM.Text);
+                Int32 ExpiryYear = Convert.ToInt32(txtcpaymentExpiryYYYY.Text);
+                string CardNumber = txtcpaymentCardNumber.Text;
+                string strCardType = txtcpaymentCardType.Text;
+                CardType objCardType;
+                if (strCardType.ToLower() == "debit")
+                    objCardType = CardType.Debit;
+                else if (strCardType.ToLower() == "credit")
+                    objCardType = CardType.Credit;
+                else if (strCardType.ToLower() == "prepaid")
+                    objCardType = CardType.Prepaid;
+                else
+                    objCardType = CardType.UnKnown;
 
-                this.amount.Value = 1;
-                this.UserDetails.Email = "user@email.com";
-                this.UserDetails.MobileNo = "9876543210";
-                orderAmount = this.amount.Value;
+                this.amount.Value = Convert.ToInt32(txtcpaymentAmount.Text);
+                this.UserDetails.Email = txtcpaymentemailid.Text;
+                this.UserDetails.MobileNo = txtcpaymentmobile.Text;
+                orderAmount = Convert.ToInt32(txtcpaymentAmount.Text);
                 var bill = await GetBillAsync(orderAmount);
                 var payment = new CardPayment()
                 {
@@ -184,7 +193,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string BankCode = "CID002";
+                string BankCode = txtPaymentBankCode.Text;
                 var bill = await GetBillAsync(orderAmount);
                 var payment = new NetBankingPayment()
                 {
@@ -287,9 +296,9 @@ namespace Citrus.SampleApp
         {
             try
             {
-                string emailid = "user@email.com";
-                string mobile = "9876543210";
-                string password = "password";
+                string emailid = txtemailid.Text;
+                string mobile = txtmobile.Text;
+                string password = txtpassword.Text;
 
                 ResultPanel.DataContext = null;
                 LoadingBar.Visibility = Visibility.Visible;
@@ -319,9 +328,9 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string emailid = "user@email.com";
-                string mobile = "9876543210";
-                string password = "password";
+                string emailid = txtemailid.Text;
+                string mobile = txtmobile.Text;
+                string password = txtpassword.Text;
 
                 var isCitrusMember = await Session.IsCitrusMemeber(emailid, password);
                 if (isCitrusMember)
@@ -357,8 +366,8 @@ namespace Citrus.SampleApp
         {
             try
             {
-                string emailid = "maheshmutyal1@mailinator.com";
-                string password = "test@123";
+                string emailid = txtsigninemailid.Text;
+                string password = txtsigninpassword.Text;
 
                 loginStatus.Text = string.Empty;
                 LoadingBar.Visibility = Visibility.Visible;
@@ -398,8 +407,8 @@ namespace Citrus.SampleApp
         {
             try
             {
-                string emailid = "user@email.com";
-                string password = "password";
+                string emailid = txtsigninemailid.Text;
+                string password = txtsigninpassword.Text;
 
                 loginStatus.Text = string.Empty;
                 LoadingBar.Visibility = Visibility.Visible;
@@ -444,7 +453,8 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                await Session.ResetPassword("user7@gmail.com");
+                string emailid = txtsigninemailid.Text;
+                await Session.ResetPassword(emailid);
                 MessageBox.Show("Password reset completed");
             }
             catch (ServiceException exception)
@@ -470,7 +480,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string UMmobile = "9876543210";
+                string UMmobile = txtUMmobile.Text;
                 await Session.UpdateMobile(UMmobile);
                 MessageBox.Show("Mobile update completed");
             }
@@ -497,8 +507,8 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string UMmobile = "9876543210";
-                string UMEmailId = "user@email.com";
+                string UMmobile = txtUMmobile.Text;
+                string UMEmailId = txtUMEmailId.Text;
                 if (!string.IsNullOrEmpty(UMmobile))
                     await Session.GenerateOTPUsingMobile(UMmobile);
                 else if (!string.IsNullOrEmpty(UMEmailId))
@@ -529,9 +539,9 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string UMOTP = "12345";
-                string UMMobile = "9876543210";
-                string UMEmailId = "user@email.com";
+                string UMOTP = txtUMOTP.Text;
+                string UMMobile = txtUMmobile.Text;
+                string UMEmailId = txtUMEmailId.Text;
                 bool flag = false;
                 if (!string.IsNullOrEmpty(UMMobile))
                     flag = await Session.SignInUsingOTP(UMMobile, UMOTP);
@@ -604,8 +614,8 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string FirstName = "Charles";
-                string LastName = "Pearson";
+                string FirstName = txtUMFirstName.Text;
+                string LastName = txtUMLastName.Text;
 
                 UserProfile userProfile = new UserProfile()
                 {
@@ -777,16 +787,25 @@ namespace Citrus.SampleApp
         {
             try
             {
-                string AccountHolderName = "Pearson Charles";
-                string CVV = "123";
-                Int32 ExpiryMonth = 1;
-                Int32 ExpiryYear = 2020;
-                string CardNumber = "4242424242424242";
-                CardType objCardType = CardType.Debit;
+                string AccountHolderName = txtcardAccountHolderName.Text;
+                string CVV = txtcardCVV.Text;
+                Int32 ExpiryMonth = Convert.ToInt32(txtcardExpiryMM.Text);
+                Int32 ExpiryYear = Convert.ToInt32(txtcardExpiryYYYY.Text);
+                string CardNumber = txtcardCardNumber.Text;
+                string strCardType = txtcardCardType.Text;
+                CardType objCardType;
+                if (strCardType.ToLower() == "debit")
+                    objCardType = CardType.Debit;
+                else if (strCardType.ToLower() == "credit")
+                    objCardType = CardType.Credit;
+                else if (strCardType.ToLower() == "prepaid")
+                    objCardType = CardType.Prepaid;
+                else
+                    objCardType = CardType.UnKnown;
 
-                this.amount.Value = 1;
-                this.UserDetails.Email = "user@email.com";
-                this.UserDetails.MobileNo = "9876543210";
+                this.amount.Value = Convert.ToInt32(txtcardAmount.Text);
+                this.UserDetails.Email = txtcardemailid.Text;
+                this.UserDetails.MobileNo = txtcardmobile.Text;
 
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
@@ -893,7 +912,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string BankCode = "CID019";
+                string BankCode = txtLoadBankCode.Text;
                 var request = new LoadMoneyRequest();
                 this.amount.Value = orderAmount;
                 request.BillAmount = this.amount;
@@ -1096,9 +1115,9 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string to = "user@email.com";
-                int amount = 1;
-                string message = "my msg";
+                string to = txtTranToEmail.Text.Trim();
+                Int32 amount = Convert.ToInt32(txtTranAmount.Text.Trim());
+                string message = txtTranMessage.Text.Trim();
 
                 var result = await Wallet.TransferMoneyUsingEmail(new TransferMoneyRequest()
                 {
@@ -1140,9 +1159,9 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string to = "user@email.com";
-                int amount = 1;
-                string message = "my msg";
+                string to = txtTranToMobile.Text.Trim();
+                Int32 amount = Convert.ToInt32(txtTranAmount.Text.Trim());
+                string message = txtTranMessage.Text.Trim();
 
                 var result = await Wallet.TransferMoneyUsingMobile(new TransferMoneyRequest()
                 {
@@ -1210,10 +1229,10 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string owner = "mahesh mutyal";
-                string branch = "HSBC0000123";
-                string number = "123456789987654";
-                string type = "prepaid";
+                string owner = txtWithdrawOwner.Text.Trim();
+                string branch = txtWithdrawBranch.Text.Trim();
+                string number = txtWithdrawNumber.Text.Trim();
+                string type = txtWithdrawType.Text.Trim();
 
                 var result = await Wallet.SaveWithdrawInfo(new WithdrawInfoResponse()
                 {

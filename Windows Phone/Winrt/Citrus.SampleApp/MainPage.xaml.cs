@@ -495,7 +495,8 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                await Session.ResetPassword("user7@gmail.com");
+                string emailid = txtsigninemailid.Text;
+                await Session.ResetPassword(emailid);
                 new MessageDialog("Password reset completed").ShowAsync();
             }
             catch (ServiceException exception)
@@ -1136,28 +1137,6 @@ namespace Citrus.SampleApp
             }
         }
 
-        private void OpenWebView(string RedirectUrl, string strcookie)
-        {
-            try
-            {
-                Uri baseUri = new Uri(RedirectUrl);
-                if (!string.IsNullOrEmpty(strcookie))
-                {
-                    Windows.Web.Http.Filters.HttpBaseProtocolFilter filter = new Windows.Web.Http.Filters.HttpBaseProtocolFilter();
-                    Windows.Web.Http.HttpCookie cookie = new Windows.Web.Http.HttpCookie(baseUri.Host, baseUri.Host, "");
-                    cookie.Value = strcookie;
-                    filter.CookieManager.SetCookie(cookie, false);
-                }
-
-                Windows.Web.Http.HttpRequestMessage httpRequestMessage = new Windows.Web.Http.HttpRequestMessage(Windows.Web.Http.HttpMethod.Get, baseUri);
-                citruswebview.NavigateWithHttpRequestMessage(httpRequestMessage);
-            }
-            catch (Exception exception)
-            {
-                new MessageDialog(exception.Message).ShowAsync();
-            }
-        }
-
         private async void GetLoadMoneyPaymentOptions_OnClick(object sender, RoutedEventArgs e)
         {
             try
@@ -1344,6 +1323,28 @@ namespace Citrus.SampleApp
         {
             var strResponse = e.Value;
             new MessageDialog(strResponse).ShowAsync();
+        }
+
+        private void OpenWebView(string RedirectUrl, string strcookie)
+        {
+            try
+            {
+                Uri baseUri = new Uri(RedirectUrl);
+                if (!string.IsNullOrEmpty(strcookie))
+                {
+                    Windows.Web.Http.Filters.HttpBaseProtocolFilter filter = new Windows.Web.Http.Filters.HttpBaseProtocolFilter();
+                    Windows.Web.Http.HttpCookie cookie = new Windows.Web.Http.HttpCookie(baseUri.Host, baseUri.Host, "");
+                    cookie.Value = strcookie;
+                    filter.CookieManager.SetCookie(cookie, false);
+                }
+
+                Windows.Web.Http.HttpRequestMessage httpRequestMessage = new Windows.Web.Http.HttpRequestMessage(Windows.Web.Http.HttpMethod.Get, baseUri);
+                citruswebview.NavigateWithHttpRequestMessage(httpRequestMessage);
+            }
+            catch (Exception exception)
+            {
+                new MessageDialog(exception.Message).ShowAsync();
+            }
         }
 
         #endregion
