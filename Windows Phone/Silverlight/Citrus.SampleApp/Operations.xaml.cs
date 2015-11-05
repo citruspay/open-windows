@@ -19,17 +19,16 @@ namespace Citrus.SampleApp
     {
         #region Init
 
-        string ReturnURL = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
-        string BillURL = "https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php";
-        
-        //string ReturnURL = "http://localhost:9001/WindowsReturnURL.aspx";
-        //string BillURL = "http://localhost:9001/billGenerator.aspx";
+        //string ReturnURL = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
+        //string BillURL = "https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php";
+
+        string ReturnURL = "http://localhost:9001/WindowsReturnURL.aspx";
+        string BillURL = "http://localhost:9001/billGenerator.aspx";
 
         public Operations()
         {
             this.InitializeComponent();
             Config.Initialize(EnvironmentType.Sandbox, "test-signup", "c78ec84e389814a05d3ae46546d16d2e", "test-signin", "52f7e15efd4208cf5345dd554443fd99", "testing");
-
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -652,7 +651,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                //UserPaymentOptionsListBox.ItemsSource = await Wallet.GetWallet();
+                savecardlistbox.ItemsSource = await Wallet.GetWallet();
             }
             catch (ServiceException exception)
             {
@@ -962,8 +961,16 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                await Wallet.GetMerchantPaymentOptions();
-                MessageBox.Show("Merchant payment options retreived");
+                var objPaymentOptions = await Wallet.GetMerchantPaymentOptions();
+                if (objPaymentOptions != null)
+                {
+                    walletlistbox.ItemsSource = objPaymentOptions.NetBankingOptions;
+                    MessageBox.Show("Merchant payment options retreived");
+                }
+                else
+                {
+                    MessageBox.Show("Merchant payment options not found");
+                }
             }
             catch (ServiceException exception)
             {
@@ -1089,8 +1096,16 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                await Wallet.GetLoadMoneyPaymentOptions();
-                MessageBox.Show("Merchant payment options retreived");
+                var objPaymentOptions = await Wallet.GetLoadMoneyPaymentOptions();
+                if (objPaymentOptions != null)
+                {
+                    walletlistbox.ItemsSource = objPaymentOptions.NetBankingOptions;
+                    MessageBox.Show("Citrus payment options retreived");
+                }
+                else
+                {
+                    MessageBox.Show("Citrus payment options not found");
+                }
             }
             catch (ServiceException exception)
             {
@@ -1273,27 +1288,31 @@ namespace Citrus.SampleApp
         private void PaymentWebView(string RedirectUrl)
         {
             paymentwebbrowser.Source = new Uri(RedirectUrl);
+            objpivot.SelectedItem = pgpaymentwebview;
         }
 
         private void LoadWebView(string RedirectUrl)
         {
+            objpivot.SelectedItem = loadwebview;
             loadwebbrowser.Source = new Uri(RedirectUrl);
         }
 
         private void loadwebbrowser_ScriptNotify(object sender, NotifyEventArgs e)
         {
             var valueFromBrowser = e.Value;
+            objpivot.SelectedItem = loadpayment;
             MessageBox.Show(valueFromBrowser);
         }
 
         private void paymentwebbrowser_ScriptNotify(object sender, NotifyEventArgs e)
         {
             var valueFromBrowser = e.Value;
+            objpivot.SelectedItem = pgpayment;
             MessageBox.Show(valueFromBrowser);
         }
 
         #endregion
 
-
     }
+
 }

@@ -17,7 +17,6 @@ namespace Citrus.SDK
 
     public static class Wallet
     {
-        private static MerchantPaymentOptions merchantPaymentOptions;
 
         #region Save Cards
 
@@ -38,7 +37,7 @@ namespace Citrus.SDK
                 var wallet = response as UserWallet;
                 if (wallet != null)
                 {
-                    if (merchantPaymentOptions != null)
+                    //if (merchantPaymentOptions != null)
                     {
                         //options.AddRange(wallet.PaymentOptions.Where(option => merchantPaymentOptions.ContainScheme(option.CardScheme, option.CardType, option.Bank)));
                         options.AddRange(wallet.PaymentOptions);
@@ -117,7 +116,7 @@ namespace Citrus.SDK
 
         #region Payment Option
 
-        public static async Task GetLoadMoneyPaymentOptions()
+        public static async Task<MerchantPaymentOptions> GetLoadMoneyPaymentOptions()
         {
             string CitrusVanity = "prepaid";
             RestWrapper restWrapper = new RestWrapper();
@@ -128,28 +127,30 @@ namespace Citrus.SDK
 
             if (!(paymentOptions is Error))
             {
-                merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
-                return;
+                MerchantPaymentOptions merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
+                return merchantPaymentOptions;
             }
 
             Utility.ParseAndThrowError(((Error)paymentOptions).Response);
+            return null;
         }
 
-        public static async Task GetMerchantPaymentOptions()
+        public static async Task<MerchantPaymentOptions> GetMerchantPaymentOptions()
         {
             RestWrapper restWrapper = new RestWrapper();
             var paymentOptions = await restWrapper.Post<MerchantPaymentOptions>(Service.GetMerchantPaymentOptions, new List<KeyValuePair<string, string>>()
             {
                 new KeyValuePair<string, string>("vanity",Session.Config.Vanity)
-            }, AuthTokenType.Simple);
+            }, AuthTokenType.None);
 
             if (!(paymentOptions is Error))
             {
-                merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
-                return;
+                MerchantPaymentOptions merchantPaymentOptions = paymentOptions as MerchantPaymentOptions;
+                return merchantPaymentOptions;
             }
 
             Utility.ParseAndThrowError(((Error)paymentOptions).Response);
+            return null;
         }
 
         #endregion

@@ -33,8 +33,15 @@ namespace Citrus.SampleApp
         #region Init
 
         //string ReturnURL = "https://salty-plateau-1529.herokuapp.com/redirectUrlLoadCash.php";
-        string ReturnURL = "http://192.168.1.193:9001/WindowsReturnURL.aspx";
-        string BillURL = "http://192.168.1.193:9001/billGenerator.aspx";
+        //string BillURL = "https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php";
+
+        string ReturnURL = "http://localhost:9001/WindowsReturnURL.aspx";
+        string BillURL = "http://localhost:9001/billGenerator.aspx";
+
+        string htmlFragment =
+                   "<html><head><script type='text/javascript'>" +
+                   "  window.external.notify('The script says the doubled value is.');" +
+                   "</script></head><body><div id='myDiv'>I AM CONTENT</div></body></html>";
 
         public MainPage()
         {
@@ -299,8 +306,6 @@ namespace Citrus.SampleApp
         {
             try
             {
-                paymentwebview.AllowedScriptNotifyUris.Add(new Uri(RedirectUrl));
-                paymentwebview.AllowedScriptNotifyUris.Add(new Uri(ReturnURL));
                 Uri targetUri = new Uri(RedirectUrl);
                 paymentwebview.Navigate(targetUri);
 
@@ -1064,11 +1069,6 @@ namespace Citrus.SampleApp
 
         private async Task<PaymentBill> GetBillAsync(Int32 orderAmount)
         {
-            //return await PaymentGateway.GetBillAsync(BillURL, new Amount()
-            //{
-            //    Value = orderAmount
-            //});
-
             return await PaymentGateway.GetBillAsync(BillURL, new Amount()
             {
                 Value = orderAmount
@@ -1348,16 +1348,6 @@ namespace Citrus.SampleApp
         }
 
         #endregion
-
-
-        //        async void paymentwebview_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
-        //        {
-        //            string inject =
-        //                @"window.alert = function(arg) {
-        //            window.external.notify(arg);
-        //        };";
-        //            await paymentwebview.InvokeScriptAsync("eval", new List<string>() { inject });
-        //        }
 
     }
 }

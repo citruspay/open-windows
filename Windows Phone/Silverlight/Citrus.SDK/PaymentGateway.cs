@@ -208,5 +208,20 @@ namespace Citrus.SDK
 
             return true;
         }
+
+        #region WebView Functions
+
+        private void OpenWebView(Transaction result)
+        {
+            if (result != null && !string.IsNullOrEmpty(result.RedirectUrl))
+            {
+                Microsoft.Phone.Tasks.WebBrowserTask webBrowserTask = new Microsoft.Phone.Tasks.WebBrowserTask();
+                webBrowserTask.Uri = new Uri(result.RedirectUrl, UriKind.Absolute);
+                webBrowserTask.Show();
+            }
+        }
+
+        #endregion
     }
+
 }

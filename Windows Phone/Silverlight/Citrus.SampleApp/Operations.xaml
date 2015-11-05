@@ -17,7 +17,7 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <!--Pivot Control-->
         <ProgressBar Height="40" HorizontalAlignment="Stretch" Visibility="Collapsed" VerticalAlignment="Center" Name="LoadingBar" IsEnabled="True" Foreground="Red" IsIndeterminate="True"></ProgressBar>
-        <phone:Pivot Title="Citrus Pay SDK Sample">
+        <phone:Pivot Title="Citrus Pay SDK Sample" Name="objpivot">
             <!--Pivot item one-->
             <phone:PivotItem Header="Sign up">
                 <Grid>
@@ -90,6 +90,31 @@
                     </StackPanel>
                 </Grid>
             </phone:PivotItem>
+            <phone:PivotItem Header="Save Card">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Button Content="Save Payment Options" Click="SavePayment_OnClick"></Button>
+                    <Button Content="Get User Payment Options" Grid.Row="1" Click="GetWallet_OnClick"></Button>
+                    <Button Content="Delete Selected Payment Option" Grid.Row="2" Click="DeletePaymentOption_OnClick"></Button>
+                    <ListBox Name="savecardlistbox" Grid.Row="3">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate >
+                                <StackPanel Margin="10,0,10,8">
+                                    <TextBlock Name="CardType" Text="{Binding CardType}" TextWrapping="Wrap" FontSize="18" />
+                                    <TextBlock Name="CardNumber" Text="{Binding CardNumber}" TextWrapping="Wrap" FontSize="24" />
+                                    <TextBlock Name="Bank" Text="{Binding Bank}" TextWrapping="Wrap" FontSize="24" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </phone:PivotItem>
+            
             <phone:PivotItem Header="Load Money">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -107,7 +132,7 @@
                     <Button Margin="15" Grid.Row="3" Height="80" Width="300" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Pay using Citrus Cash" Click="CitrusCashPayment_OnClick"></Button>
                 </Grid>
             </phone:PivotItem>
-            <phone:PivotItem Header="Load Money">
+            <phone:PivotItem Header="Load Money" Name="loadpayment">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
@@ -133,7 +158,7 @@
                     <Button Grid.Row="7" Margin="5" Height="70" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Content="Card" Click="Card_OnClick"></Button>
                 </Grid>
             </phone:PivotItem>
-            <phone:PivotItem Header="Load Money View">
+            <phone:PivotItem Header="Load Money View" Name="loadwebview">
                 <Grid>
                     <phone:WebBrowser Name="loadwebbrowser" HorizontalAlignment="Left" IsScriptEnabled="True" Margin="-1,0,0,-77" Grid.Row="1" VerticalAlignment="Top" Width="450" Height="500" ScriptNotify="loadwebbrowser_ScriptNotify"/>
                 </Grid>
@@ -149,13 +174,19 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Button Content="Save Payment Options" Click="SavePayment_OnClick"></Button>
                     <Button Content="Get Merchant Payment Options" Grid.Row="1"  Click="GetMerchantPaymentOptions_OnClick"></Button>
-                    <Button Content="Get User Payment Options" Grid.Row="2" Click="GetWallet_OnClick"></Button>
-                   
-                    <Button Content="Delete Selected Payment Option" Grid.Row="3" Click="DeletePaymentOption_OnClick"></Button>
                     <Button Content="Withdraw Money Option" Grid.Row="4" Click="WithdrawMoneyOption_OnClick"></Button>
-                    <Button Content="Get Loan Money Payment Options" Grid.Row="5"  Click="GetLoadMoneyPaymentOptions_OnClick"></Button>
+                    <Button Content="Get Loan Money Payment Options" Grid.Row="5" Click="GetLoadMoneyPaymentOptions_OnClick"></Button>
+                    <ListBox Name="walletlistbox" Grid.Row="6">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate >
+                                <StackPanel Margin="10,0,10,8">
+                                    <TextBlock Name="IssuerCode" Text="{Binding IssuerCode}" TextWrapping="Wrap" FontSize="18" />
+                                    <TextBlock Name="BankName" Text="{Binding BankName}" TextWrapping="Wrap" FontSize="24" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </Grid>
             </phone:PivotItem>
 
@@ -176,7 +207,7 @@
                 </Grid>
             </phone:PivotItem>
 
-            <phone:PivotItem Header="Card Payment">
+            <phone:PivotItem Header="Card Payment" Name="pgpayment">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
@@ -203,7 +234,7 @@
                 </Grid>
             </phone:PivotItem>
 
-            <phone:PivotItem Header="PG Payment View">
+            <phone:PivotItem Header="PG Payment View" Name="pgpaymentwebview">
                 <Grid>
                     <phone:WebBrowser Name="paymentwebbrowser" HorizontalAlignment="Left" IsScriptEnabled="True" Margin="-1,0,0,-77" Grid.Row="1" VerticalAlignment="Top" Width="450" Height="500" ScriptNotify="paymentwebbrowser_ScriptNotify" />
                 </Grid>
@@ -249,8 +280,8 @@
                     <TextBox Name="txtTranAmount" Margin="5" Grid.Row="2" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="1" />
                     <TextBox Name="txtTranMessage" Margin="5" Grid.Row="3" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" Text="Test Message.." />
 
-                    <Button Margin="5" Height="70" Width="300" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Transfer Money using Email" Click="TranMoneyEmail_OnClick"></Button>
-                    <Button Margin="5" Height="70" Width="300" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Transfer Money using Mobile" Click="TranMoneyMobile_OnClick"></Button>
+                    <Button Margin="5" Height="70" Width="350" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Transfer Money using Email" Click="TranMoneyEmail_OnClick"></Button>
+                    <Button Margin="5" Height="70" Width="350" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Transfer Money using Mobile" Click="TranMoneyMobile_OnClick"></Button>
                 </Grid>
             </phone:PivotItem>
 
