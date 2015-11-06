@@ -58,16 +58,50 @@ namespace Citrus.SampleApp
             LastName = " ",
             MobileNo = "9011094323"
         };
-        int orderAmount = 100;
+
         private Amount amount = new Amount()
         {
-            Value = 100,
+            Value = 1,
             CurrencyType = "INR"
         };
 
         #endregion
 
         #region PG Payment
+
+        private async void ShowBanks_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadingBar.Visibility = Visibility.Visible;
+                var objPaymentOptions = await Wallet.GetMerchantPaymentOptions();
+                if (objPaymentOptions != null)
+                {
+                    pgbanklistbox.ItemsSource = objPaymentOptions.NetBankingOptions;
+                    MessageBox.Show("Merchant payment options retreived");
+                }
+                else
+                {
+                    MessageBox.Show("Merchant payment options not found");
+                }
+            }
+            catch (ServiceException exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+            catch (ArgumentException exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+            finally
+            {
+                LoadingBar.Visibility = Visibility.Collapsed;
+            }
+        }
 
         private async void CardPayment_OnClick(object sender, RoutedEventArgs e)
         {
@@ -94,7 +128,7 @@ namespace Citrus.SampleApp
                 this.amount.Value = Convert.ToInt32(txtcpaymentAmount.Text);
                 this.UserDetails.Email = txtcpaymentemailid.Text;
                 this.UserDetails.MobileNo = txtcpaymentmobile.Text;
-                orderAmount = Convert.ToInt32(txtcpaymentAmount.Text);
+                Int32 orderAmount = Convert.ToInt32(txtcpaymentAmount.Text);
                 var bill = await GetBillAsync(orderAmount);
                 var payment = new CardPayment()
                 {
@@ -149,6 +183,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
+                Int32 orderAmount = 1;
                 var bill = await GetBillAsync(orderAmount);
                 var payment = new TokenPayment()
                 {
@@ -192,7 +227,13 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
-                string BankCode = txtPaymentBankCode.Text;
+                if (pgbanklistbox.SelectedItem == null || string.IsNullOrEmpty(txtpaymentAmount.Text.Trim()))
+                    return;
+
+                var selbank = pgbanklistbox.SelectedItem;
+                string BankCode = ((NetBankingOption)(selbank)).IssuerCode;
+                Int32 orderAmount = Convert.ToInt32(txtpaymentAmount.Text);
+
                 var bill = await GetBillAsync(orderAmount);
                 var payment = new NetBankingPayment()
                 {
@@ -238,6 +279,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
+                Int32 orderAmount = 1;
                 var bill = await GetBillAsync(orderAmount);
                 var payment = new TokenBankingPayment()
                 {
@@ -276,11 +318,6 @@ namespace Citrus.SampleApp
 
         private async Task<PaymentBill> GetBillAsync(int orderAmount)
         {
-            //return await PaymentGateway.GetBillAsync("https://salty-plateau-1529.herokuapp.com/billGenerator.sandbox.php", new Amount()
-            //{
-            //    Value = orderAmount
-            //});
-
             return await PaymentGateway.GetBillAsync(BillURL, new Amount()
             {
                 Value = orderAmount
@@ -866,7 +903,7 @@ namespace Citrus.SampleApp
             {
                 LoadingBar.Visibility = Visibility.Visible;
                 var request = new LoadMoneyRequest();
-                this.amount.Value = orderAmount;
+                this.amount.Value = 1;
                 request.BillAmount = this.amount;
                 request.RedirectUrl = ReturnURL;
                 request.UserDetails = this.UserDetails;
@@ -912,6 +949,8 @@ namespace Citrus.SampleApp
             {
                 LoadingBar.Visibility = Visibility.Visible;
                 string BankCode = txtLoadBankCode.Text;
+                Int32 orderAmount = 1;
+
                 var request = new LoadMoneyRequest();
                 this.amount.Value = orderAmount;
                 request.BillAmount = this.amount;
@@ -1035,6 +1074,7 @@ namespace Citrus.SampleApp
             try
             {
                 LoadingBar.Visibility = Visibility.Visible;
+                Int32 orderAmount = 1;
                 var bill = await GetBillAsync(orderAmount);
                 var payment = new CardPayment()
                 {
@@ -1314,5 +1354,4 @@ namespace Citrus.SampleApp
         #endregion
 
     }
-
 }
